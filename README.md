@@ -33,11 +33,6 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
     > When using a different board, replace the nrf52dk_nrf52832 parameter with your own.
 
     **Notes:**
-    * After having made changes to the program, do not forget to remove the previous build folder before running the build command again with:
-
-        ```text
-        rm -r build/
-        ```
 
     * It is also possible to upload the program manually by drag and dropping the generated .hex file located in the `build/zephyr/` folder.
 
@@ -49,16 +44,14 @@ Alt_flash is an alternative tool/script for programming jlink devices. This is p
 
 ```text
 cd ~/zephyrproject/zephyr
-sudo mkdir /mnt/jlink
-cp Plantenna_2_Node/alt_flash.sh .
-sudo bash alt_flash.sh -m <jlink drive letter in windows>
+sudo cp Plantenna_2_Node/alt_flash /usr/bin/
+source ~/.bashrc
 ```
-> After restarting WSL, `sudo bash alt_flash.sh -m <jlink drive letter in windows>` will have to be rerun again
 
-If all has been successfully, the board can now be programmed with:
+If all has been successfully, the board can now be programmed by running alt_flash and giving it the drive letter of the jlink device. For example when the jlink device mounted to (G:), it can be programmed as:
 
 ```text
-bash alt_flash.sh
+alt_flash G
 ```
 
 ## Bluetooth low energy profile
