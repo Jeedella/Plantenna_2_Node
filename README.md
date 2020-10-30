@@ -44,7 +44,7 @@ Alt_flash is an alternative tool/script for programming jlink devices. This is p
 
 ```text
 cd ~/zephyrproject/zephyr
-sudo cp Plantenna_2_Node/alt_flash /usr/bin/
+sudo cp Plantenna_2_Node/alt_flash_tool/alt_flash /usr/bin/
 source ~/.bashrc
 ```
 
