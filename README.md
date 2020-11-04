@@ -76,4 +76,4 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 | Pressure (hPa) | 8-9 | 2 | MyAir | int16 | - |
 | Battery voltage (mV) | 10 | 1 | MyAir | uint8 | /20 |
 | Status register | 11 | 1 | MyAir | uint8 | - |
-| Airflow (mm/s) | 10 | 2 | SPMS | uint16 | - |
+| Airflow (mm/s) | 12 | 2 | SPMS | uint16 | - |
