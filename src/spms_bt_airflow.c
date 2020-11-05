@@ -10,8 +10,12 @@ static ssize_t read_callback(struct bt_conn *conn, const struct bt_gatt_attr *at
 {
 	const char *value = attr->user_data;
 
-	return bt_gatt_attr_read(conn, attr, buf, len, offset, value,
-		sizeof(advData));
+
+    ssize_t status = bt_gatt_attr_read(conn, attr, buf, len, offset, value, sizeof(advData));
+
+    advData[14] = 0x00;
+
+	return status;
 }
 
 static ssize_t write_callback(struct bt_conn *conn, const struct bt_gatt_attr *attr,
@@ -60,6 +64,7 @@ int bt_update_airflow(spms_airflow_local* airflowMem, uint8_t status)
     advData[11] = status;
     advData[12] = (uint8_t)(airflowMem->airf >> 8);
     advData[13] = (uint8_t)(airflowMem->airf);
+    advData[14] = 0xFF;
     
     return 0;
 }

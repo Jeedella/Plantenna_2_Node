@@ -40,9 +40,10 @@ typedef struct {
     8-9         pressure            in hPa      -
     10          battery voltage     in mV       /20
     11          status register     -           -
-    12-13       airflow             in mm/s     -
+    12-13       airflow             in mm/s
+    14          is ready            -               -
 */
-typedef uint8_t spms_airflow_advertising[14];
+typedef uint8_t spms_airflow_advertising[15];
 
 // Initialize the bluetooth airflow service
 /*

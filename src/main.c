@@ -68,6 +68,7 @@ int init_SPMS() {
 	if(!bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0)) PRINT_SUCCESS;
 	else {PRINT_FAILED;	return 1;}
 
+	updateHandler();
 	printk("Initialization "); PRINT_SUCCESS;
 	return 0;
 }
