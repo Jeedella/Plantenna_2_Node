@@ -9,6 +9,10 @@ static unsigned storageIndex = 0;
 
 static const struct bt_data ad[] = {
 	BT_DATA_BYTES(BT_DATA_FLAGS, (BT_LE_AD_GENERAL | BT_LE_AD_NO_BREDR)),
+	BT_DATA_BYTES(BT_DATA_UUID128_ALL,
+	      0x9D, 0xD2, 0x0, 0x1, 0xDA, 0x1D, 0x4F, 0x20,
+		  0x95, 0x7, 0xB2, 0x63, 0x01, 0x00, 0x31, 0x1A),
+	BT_DATA_BYTES(BT_DATA_NAME_COMPLETE, 'S', 'P', 'M', 'S', ' ', 'N', '0', '1')
 };
 
 // Timer expire handler, every minute
@@ -61,7 +65,7 @@ int init_SPMS() {
 
 	// Start advertising
 	printk("\t%s bluetooth advertising ", strInit);
-	if(!bt_le_adv_start(BT_LE_ADV_CONN_NAME, ad, ARRAY_SIZE(ad), NULL, 0)) PRINT_SUCCESS;
+	if(!bt_le_adv_start(BT_LE_ADV_CONN, ad, ARRAY_SIZE(ad), NULL, 0)) PRINT_SUCCESS;
 	else {PRINT_FAILED;	return 1;}
 
 	printk("Initialization "); PRINT_SUCCESS;
