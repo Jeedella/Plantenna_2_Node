@@ -2,32 +2,21 @@
 #define __INCL_SPMS_BT_AIRFLOW
 
 // Bluetooth interace for the Smart Plant Monitoring System (SPMS) airflow
+#include "spms_libs.h"
+
+// Default device name
+#define AIRFLOW_DEVICE_NAME 'S', 'P', 'M', 'S', ' ', 'N', '0', '1'
 
 // BLE UUID's
+#define AIRFLOW_DEVICE_UUID \
+    0x9D, 0xD2, 0x0, 0x1, 0xDA, 0x1D, 0x4F, 0x20, \
+    0x95, 0x7, 0xB2, 0x63, 0x01, 0x00, 0x31, 0x1A
 #define AIRFLOW_SERVICE_UUID \
     0x9D, 0xD2, 0x0, 0x1, 0xDA, 0x1D, 0x4F, 0x20,\
     0x95, 0x7, 0xB2, 0x63, 0x01, 0x07, 0x31, 0x1A
 #define AIRFLOW_CHARACTERISTIC_UUID \
     0x9D, 0xD2, 0x0, 0x1, 0xDA, 0x1D, 0x4F, 0x20,\
     0x95, 0x7, 0xB2, 0x63, 0x02, 0x07, 0x31, 0x1A
-
-// Local data frame definition
-/*
-    time        timestamp           in epoch    -
-    temp        temperature         in °C       x100
-    humi        humidity            in %RH      x100
-    pres        pressure            in hPa      -
-    batt        battery voltage     in mV       /20
-    airf        airflow             in mm/s     -           
-*/
-typedef struct {
-    uint32_t    time;
-    int16_t     temp;
-    uint16_t    humi;
-    uint16_t    pres;
-    uint8_t     batt;
-    uint16_t    airf;
-} spms_airflow_local;
 
 // Advertising data frame definition
 /*   
@@ -43,27 +32,27 @@ typedef struct {
     12-13       airflow             in mm/s
     14          is ready            -               -
 */
-typedef uint8_t spms_airflow_advertising[15];
+typedef uint8_t ble_airflow_data[15];
 
-// Initialize the bluetooth airflow service
+// Start advertising the bluetooth airflow service
 /*
-    This service will become visible after advertising starts
-
-    ms_size     manufacturer specific size      0x1D (default)
-    ms_adtype   manufacturer specific AD type   0xFF (default)
-    id          company ID                      0xFF (default)
-
     returns 0 when no errors have occurred
 */
-int bt_init_airflow(uint8_t ms_size, uint8_t ms_adtype, uint16_t id);
+int ble_adv_start_airflow();
+
+// Stop advertising the bluetooth airflow service
+/*
+    returns 0 when no errors have occurred
+*/
+int ble_adv_stop_airflow();
 
 // Update the airflow dataframe data
 /*
-    airFlowmem  pointer to spms_airflow_local object
+    airFlowmem  pointer to airflow_local object
     status      charge state
 
     returns 0 when no errors have occurred
 */
-int bt_update_airflow(spms_airflow_local* airflowMem, uint8_t status);
+int ble_update_airflow(airflow_local* airflowMem, uint8_t status);
 
 #endif

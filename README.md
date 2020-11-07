@@ -58,11 +58,15 @@ alt_flash G
 
 The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable profiles used by the [myAir devices](https://hackmd.io/@sookah/myAir) and thus follows the same structure. A different profile ID has been added: `0x07`, since the SPMS node uses an airflow sensor instead.
 
-### Advertising
+### UUID's
 
-| Service UUID | Profile ID | Description |
-| :----: | :----: | :----: |
-| 1A310701-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+| Type | UUID | Profile ID | Description |
+| :----: | :----: | :----: | :----: |
+| Device | 1A310001-63B2-0795-204F-1DDA0100D29D | 0x00 | Portable Airflow sensor |
+| Service | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
+| Characteristic | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
+| Service | 1A310701-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+| Characteristic | 1A310702-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
 
 ### Broadcasting
 
@@ -76,4 +80,5 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 | Pressure (hPa) | 8-9 | 2 | MyAir | int16 | - |
 | Battery voltage (mV) | 10 | 1 | MyAir | uint8 | /20 |
 | Status register | 11 | 1 | MyAir | uint8 | - |
-| Airflow (mm/s) | 12 | 2 | SPMS | uint16 | - |
+| Airflow (mm/s) | 12-13 | 2 | SPMS | uint16 | - |
+| Is ready | 14 | 1 | SPMS | uint16 | - |
