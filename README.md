@@ -64,7 +64,7 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 | :----: | :----: | :----: | :----: |
 | Device | 1A310001-63B2-0795-204F-1DDA0100D29D | 0x00 | Portable Airflow sensor |
 | Service | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
-| Characteristic | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
+| Characteristic | 1A31FF02-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
 | Service | 1A310701-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
 | Characteristic | 1A310702-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
 
