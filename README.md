@@ -38,7 +38,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
 ## Workaround for programming jlink devices in WSL
 
-Alt_flash is an alternative tool/script for programming jlink devices. This is possible since WSL allows mounting windows drives and Jlink devices just so happens to be seen as one. Before trying to set it up make sure the [how-to-run](##how-to-run) steps have been completed, except flashing the board of course.
+Alt_flash is an alternative tool/script for programming jlink devices. This is possible since WSL allows mounting windows drives and Jlink devices just so happens to be seen as one. Before trying to set it up make sure the [how-to-run](#how-to-run) steps have been completed, except flashing the board of course.
 
 ### How to setup
 
