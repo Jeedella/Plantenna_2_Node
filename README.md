@@ -8,7 +8,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
 1. Setup a Zephyr development environment by following the [getting started guide](https://docs.zephyrproject.org/latest/getting_started/index.html) and make sure the blinky sample builds without issues. It is recommended to make use of an Ubuntu based machine, since the required Toolchains in the Nordic SDK are not supported on Windows or macOS. One can also emulate Ubuntu ([WSL](https://ubuntu.com/wsl) or [Virtual Machine](https://www.virtualbox.org/)) to circumvent this issue.
 
-    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#-Workaround-for-programming-jlink-devices-in-WSL) is a workaround.
+    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#workaround-for-programming-jlink-devices-in-WSL) is a workaround.
 
 2. Change directory to your zephyr folder and clone this repository:
 
@@ -38,7 +38,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
 ## Workaround for programming jlink devices in WSL
 
-Alt_flash is an alternative tool/script for programming jlink devices. This is possible since WSL allows mounting windows drives and Jlink devices just so happens to be seen as one. Before trying to set it up make sure the [how-to-run](##-How-to-run) steps have been completed, except flashing the board of course.
+Alt_flash is an alternative tool/script for programming jlink devices. This is possible since WSL allows mounting windows drives and Jlink devices just so happens to be seen as one. Before trying to set it up make sure the [how-to-run](##how-to-run) steps have been completed, except flashing the board of course.
 
 ### How to setup
 
