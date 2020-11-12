@@ -84,16 +84,16 @@ int ble_update_airflow(airflow_local* airflowMem, uint8_t status)
 {
     printk("[Log] Updated local storage\n");
 
-    airflowData[4] = (uint8_t)(airflowMem->temp >> 8);
-    airflowData[5] = (uint8_t)(airflowMem->temp);
-    airflowData[6] = (uint8_t)(airflowMem->humi >> 8);
-    airflowData[7] = (uint8_t)(airflowMem->humi);
-    airflowData[8] = (uint8_t)(airflowMem->pres >> 8);
-    airflowData[9] = (uint8_t)(airflowMem->pres);
+    airflowData[4] = (uint8_t)(airflowMem->temp);
+    airflowData[5] = (uint8_t)(airflowMem->temp >> 8);
+    airflowData[6] = (uint8_t)(airflowMem->humi);
+    airflowData[7] = (uint8_t)(airflowMem->humi >> 8);
+    airflowData[8] = (uint8_t)(airflowMem->pres);
+    airflowData[9] = (uint8_t)(airflowMem->pres >> 8);
     //airflowData[10] = airflowMem->batt;
     airflowData[11] = status;
-    airflowData[12] = (uint8_t)(airflowMem->airf >> 8);
-    airflowData[13] = (uint8_t)(airflowMem->airf);
+    airflowData[12] = (uint8_t)(airflowMem->airf);
+    airflowData[13] = (uint8_t)(airflowMem->airf >> 8);
     airflowData[14] = 0xFF;
     
     return 0;
