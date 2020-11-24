@@ -1,0 +1,41 @@
+#!/bin/bash
+
+HEX_PATH="build/zephyr/"
+WIN_PATH="/mnt/c/Users/Public/"
+
+HEX_FILE="zephyr.hex"
+BATCH_FILE="jlink.bat"
+
+BATCH_COM="COPY"
+
+alt_commands() {
+    echo -e "\talt_flash \t <windows jlink device drive letter>"
+    echo ""
+    echo "Example when mounted to G:\\"
+    echo -e "\talt_flash G"
+}
+
+alt_flash() {
+if [ ! -z $1 ]; then
+    echo "Generating batch file"
+    touch ${BATCH_FILE}
+    echo "${BATCH_COM} ${HEX_FILE} $1:\\" > ${BATCH_FILE}
+
+    echo "Copy files to unrestricted location"
+    cp ${BATCH_FILE} ${HEX_PATH}${HEX_FILE} ${WIN_PATH}
+    rm ${BATCH_FILE}
+
+    echo "Programming jlink device"
+    cd ${WIN_PATH}
+    cmd.exe /c ${BATCH_FILE}
+
+    echo ""
+    echo "Cleanup"
+    rm ${BATCH_FILE} ${HEX_FILE}
+else
+    echo "No arguments given"
+    alt_commands
+fi
+}
+
+alt_flash $1
