@@ -1,50 +1,84 @@
-# Project Plant Sensing System - nRF52-DK nodes
-This README shows how to program the nRF52-DK using Segger Embedded Studdio or with a prewritten .hex-file.\
-In addition, the current status of this project and the to-do list are added below.
+# Smart Plant Monitoring System Zephyr-based Node
 
-## Program the nRF52-DK using Segger Embedded Studio
-For the nRF52-DK, Segger Embedded Studio can be used to program it. For later developed nRF-DKs, something like Zephyr RTOS must be used to program it. Here, we will only look at Segger Embedded Studio.\
-\
-**Step 1. Install Segger Embedded Studio**\
-Segger Embedded Studio can be installed here: https://www.segger.com/downloads/embedded-studio
+Repository that contains the sources for the node of the Smart Plant Monitoring System (SPMS) Fontys project. The program runs on [Zephyr RTOS](https://zephyrproject.org/) and has been prototyped using the [nRF52 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52-DK) (nRF52832 SoC).
 
-**Step 2. Connecting to the J-Link**\
-Create a new project or open an existing. Now, connect the nRF52-DK with a micro usb to usb cable to your laptop. In the menu above, click on "Target", then "Connect J-Link". On the bottom left a message should appear that says something simelar to: "J-Link connected". Also, in the menu above, at "Target" you should now see that you can disconnect from the J-Link (second option).
+The main goal of the project is to make a proof of concept for a bluetooth mesh network of plant monitoring nodes. The data of all the nodes is collected by a [gateway](https://github.com/Jeedella/Plantenna_2_Gateway) and pushed to a [cloud database](https://github.com/Jeedella/Plantenna_2_Cloud) for potential further processing.
 
-**Step 3. Run or debug the program**\
-In the menu above, click "Build", then "Build and Run" for running to project. For debugging, click "Build and Debug".
+## How to run
 
-## Program the nRF52-DK with a prewritten .hex-file
-**Step 1. Connecting the nRF52-DK to your laptop**\
-The nRF52-DK can be easily connected to your laptop/PC with a micro usb to usb cable. When you turn on the nRF52-DK, you should see a new drive (named J-Link) appear in your file explorer.
+1. Setup a Zephyr development environment by following the [getting started guide](https://docs.zephyrproject.org/latest/getting_started/index.html) and make sure the blinky sample builds without issues. It is recommended to make use of an Ubuntu based machine, since the required Toolchains in the Nordic SDK are not supported on Windows or macOS. One can also emulate Ubuntu ([WSL](https://ubuntu.com/wsl) or [Virtual Machine](https://www.virtualbox.org/)) to circumvent this issue.
 
-**Step 2. Program the nRF52-DK**\
-Now, the nRF52-DK can be easily programmed by dragging and dropping a prewritten .hex-file on the J-Link drive.
+    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#workaround-for-programming-jlink-devices-in-WSL) is a workaround.
 
-## Current status of the project
-**bluez meshctl with nRF52-DK nodes:**
-- Looking at the Gateway repo, a demo was made with bluez meshctl on the Raspberry Pi 4 and 2 nRF52-DKs running Zephyr.hex. The Zephyr.hex and an additional Zephyr.elf are located in this repo in "zephyr_firmware.zip".
+2. Change directory to your zephyr folder and clone this repository:
 
-\
-**Sensors:**
-- <update needed>
+    ```text
+    cd ~/zephyrproject/zephyr
+    git clone https://github.com/Tijntj3/Plantenna_2_Node.git
+    ```
 
-\
-**mesh network with only nRF52-DKs:**
-- <update needed>
+    > When wanting to build the program outside of the zephyr environment do not forget to set its base path in .bashrc:
+    >
+    > ```text
+    > echo 'export ZEPHYR_BASE=~/zephyrproject/zephyr' >> ~/.bashrc
+    > ```
 
-## To-do list
-**General:**
-- Update repo and README regarding Sensors and mesh network.
+3. If everything up to this point has been setup correctly, the program can be build and uploaded just like the zephyr samples:
 
-\
-**bluez meshctl with nRF52-DK nodes:**
-- Research into using Zephyr RTOS for creating BLE mesh nodes on the nRF52-DKs.
+    ```text
+    west build -p auto -b nrf52dk_nrf52832 Plantenna_2_Node/
+    west flash
+    ```
 
-\
-**Sensors:**
-- <update needed>
+    > When using a different board, replace the nrf52dk_nrf52832 parameter with your own.
 
-\
-**mesh network with only nRF52-DKs:**
-- <update needed>
+    **Notes:**
+
+    * It is also possible to upload the program manually by drag and dropping the generated .hex file located in the `build/zephyr/` folder.
+
+## Workaround for programming jlink devices in WSL
+
+Alt_flash is an alternative tool/script for programming jlink devices. This is possible since WSL allows mounting windows drives and Jlink devices just so happens to be seen as one. Before trying to set it up make sure the [how-to-run](#how-to-run) steps have been completed, except flashing the board of course.
+
+### How to setup
+
+```text
+cd ~/zephyrproject/zephyr
+sudo cp Plantenna_2_Node/alt_flash_tool/alt_flash /usr/bin/
+source ~/.bashrc
+```
+
+If all has been successfully, the board can now be programmed by running alt_flash and giving it the drive letter of the jlink device. For example when the jlink device mounted to (G:), it can be programmed as:
+
+```text
+alt_flash G
+```
+
+## Bluetooth low energy profile
+
+The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable profiles used by the [myAir devices](https://hackmd.io/@sookah/myAir) and thus follows the same structure. A different profile ID has been added: `0x07`, since the SPMS node uses an airflow sensor instead.
+
+### UUID's
+
+| Type | UUID | Profile ID | Description |
+| :----: | :----: | :----: | :----: |
+| Device | 1A310001-63B2-0795-204F-1DDA0100D29D | 0x00 | Portable Airflow sensor |
+| Service | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
+| Characteristic | 1A31FF02-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
+| Service | 1A310701-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+| Characteristic | 1A310702-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+
+### Broadcasting
+
+| Data | Element | Size | Type | Data Type | Factor |
+| :----: | :----: | :----: | :----: | :----: | :----: |
+| Manufacturer specific size (0x1D) | 0 | 1 | Company | uint8 | - |
+| AD type manufacturer specific (0xFF) | 1 | 1 | Company | uint8 | - |
+| Company ID (tbd, 0xFF) | 2-3 | 2 | Company | uint16 | - |
+| Temperature (°C) | 4-5 | 2 | MyAir | int16 | x100 |
+| Humidity (%RH) | 6-7 | 2 | MyAir | int16 | x100 |
+| Pressure (hPa) | 8-9 | 2 | MyAir | int16 | - |
+| Battery voltage (mV) | 10 | 1 | MyAir | uint8 | /20 |
+| Status register | 11 | 1 | MyAir | uint8 | - |
+| Airflow (mm/s) | 12-13 | 2 | SPMS | uint16 | - |
+| Is ready | 14 | 1 | SPMS | uint8 | - |
