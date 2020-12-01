@@ -14,7 +14,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
     ```text
     cd ~/zephyrproject/zephyr
-    git clone https://github.com/Tijntj3/Plantenna_2_Node.git
+    git clone https://github.com/Jeedella/Plantenna_2_Node.git
     ```
 
     > When wanting to build the program outside of the zephyr environment do not forget to set its base path in .bashrc:
