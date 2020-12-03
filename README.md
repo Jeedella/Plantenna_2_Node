@@ -62,13 +62,11 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 
 | Type | UUID | Profile ID | Description |
 | :----: | :----: | :----: | :----: |
-| Device | 1A310001-63B2-0795-204F-1DDA0100D29D | 0x00 | Portable Airflow sensor |
-| Service | 1A31FF01-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
-| Characteristic | 1A31FF02-63B2-0795-204F-1DDA0100D29D | 0xFF | Available tasks |
-| Service | 1A310701-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
-| Characteristic | 1A310702-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+| Device | 1A310701-63B2-0795-204F-1DDA0100D29D | 0x00 | Portable Airflow sensor |
+| Service | 1A310702-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
+| Characteristic | 1A310703-63B2-0795-204F-1DDA0100D29D | 0x07 | Portable Airflow sensor |
 
-### Broadcasting
+### Data frame
 
 | Data | Element | Size | Type | Data Type | Factor |
 | :----: | :----: | :----: | :----: | :----: | :----: |
@@ -81,4 +79,3 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 | Battery voltage (mV) | 10 | 1 | MyAir | uint8 | /20 |
 | Status register | 11 | 1 | MyAir | uint8 | - |
 | Airflow (mm/s) | 12-13 | 2 | SPMS | uint16 | - |
-| Is ready | 14 | 1 | SPMS | uint8 | - |
