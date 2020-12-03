@@ -36,7 +36,7 @@ typedef struct {
     uint16_t    humi;
     uint16_t    pres;
     uint8_t     batt;
-    uint8_t     airf;
+    uint16_t    airf;
 } airflow_local;
 
 #endif

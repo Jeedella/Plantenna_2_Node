@@ -23,6 +23,8 @@
 #define BME280_LABEL "<none>"
 #endif
 
+#define MAX_STRING 6
+
 // Globals
 static struct device* devBME = NULL;
 static struct device* devADC = NULL;
@@ -77,9 +79,10 @@ int sensor_init()
 int sensor_read(airflow_local* airflowMem) 
 {
     int16_t tmp;
-    double Vout, Vout_debug; 
-    double offset = 1.210; 
-    struct sensor_value temp, humi, pres, airf;
+    double Vout; 
+    double offset = 1.210;
+    char Vout_string[MAX_STRING]; 
+    struct sensor_value temp, humi, pres;
 
     struct adc_sequence sequence1 = {
 		.channels    = BIT(ADC_1ST_CHANNEL_ID),
@@ -94,22 +97,20 @@ int sensor_read(airflow_local* airflowMem)
 
     // calculate V airflow sensor
     Vout = 3.3 * tmp * offset / 1023; 
-    Vout_debug = 3.3 * tmp * offset / 1023 * 1000;  
-    int Vout_int = (int)Vout_debug; 
-
-    printk("[Sensor] Vout :%d\n", Vout_int); 
+    
+    // Debug
+    sprintf(Vout_string, "%.3f", Vout);
+    printk("[Sensor] Vout :%s\n", Vout_string); 
 
     // calculate speed from V
     airflowMem->airf = pow((((Vout - 1.30)/(3.038517*pow(25,0.115157)))/0.087288),3.009364)*0.44704;
 
-
-    printf("[Sensor] adc value :%d\n", tmp);
-    printf("[Sensor] airflow speed :%d\n", airflowMem->airf);
+    printk("[Sensor] adc value :%d\n", tmp);
+    printk("[Sensor] airflow speed :%d\n", airflowMem->airf);
 
     if (devBME != NULL) {
 
         printk("[Log] Fetching BME 280 data\n");
-
 
 		sensor_sample_fetch(devBME);
 		sensor_channel_get(devBME, SENSOR_CHAN_AMBIENT_TEMP, &temp);
