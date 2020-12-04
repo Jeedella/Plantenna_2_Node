@@ -24,6 +24,7 @@ void updateHandler()
 		sensor_read(&localStorage[storageIndex]);
 		ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
 		storageIndex++;
+        printk("[Log] Updated local storage\n");
 	}
 	else printk("[Error] local storage out of memory\n");
 }
