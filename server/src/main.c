@@ -1,12 +1,27 @@
-// Includes
+/*
+* Plantenna 2 node - bt mesh (Setup) Server test file
+* File name:	main.c
+* Author:		Frank Arts
+* Date:			20-01-2020
+* Version:		V1
+* Version info
+* - Build on previous version of ble main.c
+* - Added bt mesh enable function
+*/
+
+/* BLE */
+// SPMS
 #include "spms_libs.h"
 #include "spms_ble.h"
 #include "spms_sensor.h"
 
+// BT MESH base model (config + health) + other added models
+#include "base_model.h"
+
 // Compiler macros
 #define HEAP_SIZE 512
 
-//Includes
+// globals
 static airflow_local* localStorage;
 static struct k_timer updateTimer;
 static unsigned storageIndex = 0;
@@ -24,7 +39,6 @@ void updateHandler()
 		sensor_read(&localStorage[storageIndex]);
 		ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
 		storageIndex++;
-        printk("[Log] Updated local storage\n");
 	}
 	else printk("[Error] local storage out of memory\n");
 }
@@ -78,18 +92,25 @@ int init_SPMS()
 	return 0;
 }
 
-// Main
-int main()
-{
-	if(!init_SPMS()) {
-		printk("[Starting] Application\n");
-		updateHandler();
-		while(1)
-		{
 
-		}
+/* main */
+void main() {
+	printk("Plantenna 2.0 node - Client (test)\n");
+
+	int err = bt_enable(spms_mesh_init);
+	if (err) {
+		printk("bt_enable failed with err %d\n", err);
 	}
+	
+	// if(!init_SPMS()) {
+		// printk("[Starting] Application\n");
+		// updateHandler();
+		// while(1)
+		// {
+
+		// }
+	// }
 	printk("[Stopping] Application\n");
 
-	return 0;
+	return;
 }
