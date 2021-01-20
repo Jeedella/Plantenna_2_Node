@@ -9,8 +9,8 @@
 * - Added skeleton of bt mesh sensor setup server and server
 */
 
-#ifndef SENSOR_SERVER_H__
-#define SENSOR_SERVER_H__
+#ifndef __SENSOR_SERVER_H
+#define __SENSOR_SERVER_H
 
 /* C standard includes */
 #include <stdint.h>
@@ -21,6 +21,9 @@
 #include <settings/settings.h>
 #include <bluetooth/mesh/proxy.h>
 #include <bluetooth/mesh/access.h>
+
+/* BT MESH Sensor Model includes */
+#include "sensor_common.h"
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -111,4 +114,4 @@ static const struct bt_mesh_model_op sensor_srv_op[] = {
 #define sensor_model_pub_msg_length 3	// Lenght of publication messages
 BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_model_pub_msg_length);
 
-#endif /* SENSOR_SERVER_H__ */
+#endif /* __SENSOR_SERVER_H */

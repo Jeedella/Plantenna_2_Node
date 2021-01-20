@@ -9,10 +9,6 @@
 * - Added skeleton of bt mesh sensor setup server and server
 */
 
-
-/* BT MESH Sensor Setup Server Model include */
-#include "sensor_setup_server.h"
-
 /* C standard includes */
 #include <stdint.h>
 #include <stddef.h>
@@ -24,6 +20,11 @@
 #include <settings/settings.h>
 #include <bluetooth/mesh/proxy.h>
 #include <bluetooth/mesh/access.h>
+
+/* BT MESH Sensor Model includes */
+#include "sensor_setup_server.h"
+#include "sensor_common.h"
+
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor functions

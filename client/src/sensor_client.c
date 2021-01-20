@@ -9,9 +9,6 @@
 * - Added skeleton of bt mesh sensor client
 */
 
-/* BT MESH Sensor Client Model include */
-#include "sensor_client.h"
-
 /* C standard includes */
 #include <stdint.h>
 #include <stddef.h>
@@ -23,6 +20,11 @@
 #include <settings/settings.h>
 #include <bluetooth/mesh/proxy.h>
 #include <bluetooth/mesh/access.h>
+
+/* BT MESH Sensor Model includes */
+#include "sensor_client.h"
+#include "sensor_common.h"
+
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor functions
