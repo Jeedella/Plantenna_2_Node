@@ -2,7 +2,7 @@
 * Plantenna 2 node - bt mesh sensor setup server
 * File name:	sensor_setup_server.h
 * Author:		Frank Arts
-* Date:			20-01-2020
+* Date:			20-01-2021
 * Version:		V1
 * Version info
 * - Created of file

@@ -2,7 +2,7 @@
 * Plantenna 2 node - bt mesh Client test file
 * File name:	main.c
 * Author:		Frank Arts
-* Date:			20-01-2020
+* Date:			20-01-2021
 * Version:		V1
 * Version info
 * - Build on previous version of ble main.c

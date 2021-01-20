@@ -2,7 +2,7 @@
 * Plantenna 2 node - bt mesh base_model [client]
 * File name:	base_model.c
 * Author:		Frank Arts
-* Date:			20-01-2020
+* Date:			20-01-2021
 * Version:		V1
 * Version info
 * - Created of file
