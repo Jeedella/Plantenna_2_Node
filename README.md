@@ -14,7 +14,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
     It is recommended to make use of an Ubuntu based machine, since the required Toolchains in the Nordic SDK are not supported on Windows or macOS. One can also virtualize Ubuntu ([WSL](https://ubuntu.com/wsl) or more preferably [Virtual box](https://www.virtualbox.org/)) to circumvent this issue. A short guide to setup Virtual box can be found [here](#Brief-Ubuntu-VM-setup-using-virtual-box).
 
-    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#workaround-for-programming-jlink-devices-in-WSL) is a workaround.
+    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#-Workaround-for-programming-jlink-devices-in-WSL) is a workaround.
 
 2. Change directory to your zephyr folder and clone this repository:
 

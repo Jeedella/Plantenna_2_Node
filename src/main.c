@@ -62,7 +62,7 @@ int init_SPMS()
 	// Start "update" timer, callback every minute
 	printk("[%s] update timer\n", strInit);
 	k_timer_init(&updateTimer, updateHandler, NULL);
-	k_timer_start(&updateTimer, K_SECONDS(60), K_SECONDS(60));
+	k_timer_start(&updateTimer, K_SECONDS(5), K_SECONDS(5));
 	printk("%s %s update timer\n", strPass, strInit);
 
 	// Start advertising
