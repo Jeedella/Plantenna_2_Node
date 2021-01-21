@@ -2,11 +2,11 @@
 * Plantenna 2 node - bt mesh sensor common
 * File name:    sensor_client.h
 * Author:       Frank Arts
-* Date:         20-01-2021
-* Version:      V1
+* Date:         21-01-2021
+* Version:      V1.1
 * Version info
-* - Created of file
-* - Added defines and structs for sensor opcodes and states
+* - Added _t to all typedefs
+* - Added typedef for message packets
 */
 
 #ifndef __SENSOR_COMMON_H
@@ -58,7 +58,7 @@
 typedef struct
 {
     uint16_t sensor_property_id;    // Property ID of the sensor (16 bits)
-} sensor_descriptor_state_short;
+} sensor_descriptor_state_short_t;
 
 typedef struct
 {
@@ -68,45 +68,45 @@ typedef struct
     uint8_t  sensor_sampling_function;          // Sensor sampling funcciton (8 bits)
     uint8_t  sensor_measurement_period;         // Sensor measuremtn period  (8 bits)
     uint8_t  sensor_update_interval;            // Sensor update interval    (8 bits)
-} sensor_descriptor_state_full;
+} sensor_descriptor_state_full_t;
 
 
 // Sensor Data State (Ch4.1.4)
 typedef struct
 {
     uint16_t property_id;    // ID of the device property of the sensor (16 bits)
-} sensor_data_state_short;
+} sensor_data_state_short_t;
 
 typedef struct
 {
     uint8_t  format      : 1;     // Foramt A tag, 0b0 (1 bit)
     uint8_t  lenght      : 4;     // Length of the Property Value  (4 bits)
     uint16_t property_id : 11;    // Property identifying a sensor (11 bits)
-} MPID_A; // Foramt A (short)
+} MPID_A_t; // Foramt A (short)
 
 typedef struct
 {
     uint8_t  format      : 1;    // Foramt A tag, 0b1 (1 bit)
     uint8_t  lenght      : 7;    // Length of the Property Value  (7 bits)
     uint16_t property_id;        // Property identifying a sensor (16 bits)
-} MPID_B; // Format B (long)
+} MPID_B_t; // Format B (long)
 
 typedef union
 {
-    MPID_A MPID_short;    // Format A (short)
-    MPID_B MPID_long;     // Format B (long)
-} mpid; // Marshalled Property ID
+    MPID_A_t MPID_short;    // Format A (short)
+    MPID_B_t MPID_long;     // Format B (long)
+} mpid_t; // Marshalled Property ID
 
 typedef struct
 {
-    mpid    MPID;         // TLV (Tag-Length-Value) of the device property of a sensor (16 or 24 bits)
+    mpid_t  MPID;         // TLV (Tag-Length-Value) of the device property of a sensor (16 or 24 bits)
     uint8_t raw_value;    // (Variable) Raw value field with a size and representation of the device property (8 bits)
-} sensor_data_state_single;
+} sensor_data_state_single_t;
 
 typedef struct
 {
-    sensor_data_state_single* marshalled_sensor_data;    // (Variable) The Sensor Data state (variable bits)
-} sensor_data_state_multiple;
+    sensor_data_state_single_t* marshalled_sensor_data;    // (Variable) The Sensor Data state (variable bits)
+} sensor_data_state_multiple_t;
 
 
 // Sensor Column State (Ch4.1.5)
@@ -114,7 +114,7 @@ typedef struct
 {
     uint16_t property_id;    // Property describing the data series of the sensor (16 bits)
     uint8_t  raw_value_x;    // (Variable) Raw value representing the left corner of a column on the X axis (8 bits)
-} sensor_column_state_short;
+} sensor_column_state_short_t;
 
 typedef struct
 {
@@ -122,21 +122,21 @@ typedef struct
     uint8_t  raw_value_x;     // (Variable) Raw value representing the left corner of a column on the X axis (8 bits)
     uint8_t  column_width;    // (Variable) Raw value representing the witdh of a column (8 bits)
     uint8_t  raw_value_y;     // (Variable) Raw value representing the height of a column on the Y axis (8 bits)
-} sensor_column_state_full;
+} sensor_column_state_full_t;
 
 
 // Sensor Series State (Ch4.1.5)
 typedef struct
 {
     uint16_t property_id;    // Property identifying a sensor (16 bits)
-} sensor_series_state_short;
+} sensor_series_state_short_t;
 
 typedef struct
 {
     uint16_t property_id;     // Property identifying a sensor (16 bits)
     uint8_t  raw_value_x1;    // (Variable) Raw value identifying a starting column (8 bits)
     uint8_t  raw_value_x2;    // (Variable) Raw value identifying an ending  column (8 bits)
-} sensor_series_state_middle;
+} sensor_series_state_middle_t;
 
 typedef struct
 {
@@ -144,14 +144,14 @@ typedef struct
     uint8_t* raw_value_x;     // (Variable) Raw value representing the left corner of the nth column on the X axis (8 bits)
     uint8_t* column_width;    // (Variable) Raw value representing the width of a column (8 bits)
     uint8_t* raw_value_y;     // (Variable) Raw valeu representing the height of the nth column on the Y axis (8 bits)
-} sensor_series_state_full;
+} sensor_series_state_full_t;
 
 
 // Sensor Cadence State (Ch4.1.3)
 typedef struct
 {
     uint16_t sensor_property;    // Property ID of the sensor (16 bits)
-} sensor_cadence_state_short;
+} sensor_cadence_state_short_t;
 
 typedef struct
 {
@@ -163,20 +163,20 @@ typedef struct
     uint8_t  status_min_interval         : 8;    // Minimum interval between two consecutive Status messages (8 bits)
     uint8_t  status_cadence_low;                 // (Variable) Low  value of the fast cadence range (8 bits)
     uint8_t  status_cadence_high;                // (Variable) High value of the fast cadence range (8 bits)
-} sensor_cadence_state_full;
+} sensor_cadence_state_full_t;
 
 
 // Sensor Settings State (None)
 typedef struct
 {
     uint16_t sensor_property_id;    // Property ID of the sensor (16 bits)
-} sensor_settings_state_short;
+} sensor_settings_state_short_t;
 
 typedef struct
 {
     uint16_t sensor_property_id;               // Property ID of the sensor (16 bits)
     uint16_t sensor_setting_property_ids[];    // (Variable) A sequence of N Sensor Settign Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
-} sensor_settings_state_full;
+} sensor_settings_state_full_t;
 
 
 // Sensor Setting State (Ch4.1.2)
@@ -184,14 +184,14 @@ typedef struct
 {
     uint16_t sensor_property_id;            // Property ID of the sensor (16 bits)
     uint16_t sensor_setting_property_id;    // Property ID of the setting within the sensor (16 bits)
-} sensor_setting_state_short;
+} sensor_setting_state_short_t;
 
 typedef struct
 {
     uint16_t sensor_property_id;            // Property ID of the sensor (16 bits)
     uint16_t sensor_setting_property_id;    // Property ID of the setting within the sensor (16 bits)
     uint8_t  sensor_setting_raw[];          // (Variable) Raw value of a setting within the sensor (8 bits)
-} sensor_setting_state_middle;
+} sensor_setting_state_middle_t;
 
 typedef struct
 {
@@ -199,6 +199,123 @@ typedef struct
     uint16_t sensor_setting_property_id;    // Property ID of the setting within the sensor (16 bits)
     uint8_t  sensor_setting_access;         // Read/Write access rights of the setting (8 bits)
     uint8_t  sensor_setting_raw[];          // (Variable) Raw value of a setting within the sensor (8 bits)
-} sensor_setting_state_full;
+} sensor_setting_state_full_t;
+
+// -------------------------------------------------------------------------------------------------------
+// Messsage packets (Ch4.2 MshMDLv1.0.1)
+// --------------------------
+// Sensor Descriptor Message packets //
+// Get (Ch4.2.1)
+typedef sensor_descriptor_state_short_t sensor_descriptor_get_msg_pkt_t;
+
+// Status (Ch4.2.2)
+typedef union
+{
+    sensor_descriptor_state_short_t short_pkt;
+    sensor_descriptor_state_full_t  full_pkt;
+} sensor_descriptor_status_msg_pkt_t_union;
+
+typedef sensor_descriptor_status_msg_pkt_t_union sensor_descriptor_status_msg_pkt_t;
+
+
+// Sensor Data Message packets //
+// Get (Ch4.2.13)
+typedef sensor_data_state_short_t sensor_data_get_msg_pkt_t;
+
+// Status (Ch4.2.14)
+typedef union
+{
+    sensor_data_state_single_t   single_sensor;
+    sensor_data_state_multiple_t multiple_sensors;
+} sensor_data_status_msg_pkt_t_union;
+
+typedef sensor_data_status_msg_pkt_t_union sensor_data_status_msg_pkt_t;
+
+
+// Sensor Column Message packets //
+// Get (Ch4.2.15)
+typedef sensor_column_state_short_t sensor_column_get_msg_pkt_t;
+
+// Status (Ch4.2.16)
+typedef union
+{
+    sensor_column_state_short_t short_pkt;
+    sensor_column_state_full_t  full_pkt;
+} sensor_column_status_msg_pkt_t_union;
+
+typedef sensor_column_status_msg_pkt_t_union sensor_column_status_msg_pkt_t;
+
+
+// Sensor Series Message packets //
+// Get (Ch4.2.17)
+typedef union {
+    sensor_series_state_short_t  short_pkt;
+    sensor_series_state_middle_t middle_pkt;
+} sensor_seires_get_msg_pkt_t_union;
+
+typedef sensor_seires_get_msg_pkt_t_union sensor_seires_get_msg_pkt_t;
+
+// Status (Ch4.2.18)
+typedef union {
+    sensor_series_state_short_t short_pkt;
+    sensor_series_state_full_t  full_pkt;
+} sensor_seires_status_msg_pkt_t_union;
+
+typedef sensor_seires_status_msg_pkt_t_union sensor_seires_status_msg_pkt_t;
+
+
+// Sensor Cadence Message packets //
+// Get (Ch4.2.3)
+typedef sensor_cadence_state_short_t sensor_cadence_get_msg_pkt_t;
+
+// Set (Ch4.2.4)
+typedef sensor_cadence_state_full_t sensor_cadence_set_msg_pkt_t;
+
+// Set Unack (Ch4.2.5)
+typedef sensor_cadence_state_full_t sensor_cadence_set_unack_msg_pkt_t;
+
+// Set Status (Ch4.2.6)
+typedef union
+{
+    sensor_cadence_state_short_t short_pkt;
+    sensor_cadence_state_full_t  full_pkt;
+} sensor_cadence_status_msg_pkt_t_union;
+
+typedef sensor_cadence_status_msg_pkt_t_union sensor_cadence_status_msg_pkt_t;
+
+
+// Sensor Settings Message packets //
+// Get (Ch4.2.7)
+typedef sensor_settings_state_short_t sensor_settings_get_msg_pkt_t;
+
+// Status (Ch4.2.8)
+typedef union
+{
+    sensor_settings_state_short_t short_pkt;
+    sensor_settings_state_full_t  full_ptk;
+} sensor_settings_status_msg_pkt_t_union;
+
+typedef sensor_settings_status_msg_pkt_t_union sensor_settings_status_msg_pkt_t;
+
+
+// Sensor Setting Message packets //
+// Get  (Ch4.2.9)
+typedef sensor_setting_state_short_t sensor_setting_get_msg_pkt_t;
+
+// Set (Ch4.2.10)
+typedef sensor_setting_state_middle_t sensor_setting_set_msg_pkt_t;
+
+// Set Unack (Ch4.2.11)
+typedef sensor_setting_state_middle_t sensor_setting_set_unack_msg_pkt_t;
+
+// Status (Ch4.2.12)
+typedef union
+{
+    sensor_setting_state_short_t short_pkt;
+    sensor_setting_state_full_t  full_pkt;
+} sensor_setting_status_msg_pkt_t_union;
+
+typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
+
 
 #endif /* __SENSOR_COMMON_H */
