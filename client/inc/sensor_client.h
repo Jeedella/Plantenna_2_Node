@@ -66,6 +66,9 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
                             struct net_buf_simple *buf);
 
 
+// TX messages
+int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id);
+
 // Opcode
 static const struct bt_mesh_model_op sensor_cli_op[] = {
     {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS, 1, sensor_descriptor_status_rx},

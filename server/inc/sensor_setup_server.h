@@ -62,8 +62,20 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 
 // Descriptor, Data, Column and Series in Sensor Server Model
 
-// sensor_srv_op[] in header
-// sensor_srv in header
+// Opcode
+static const struct bt_mesh_model_op sensor_setup_srv_op[] = {
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_GET,       1, sensor_cadence_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET,       1, sensor_cadence_set_rx},
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET_UNACK, 1, sensor_cadence_set_unack_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_GET,      1, sensor_settings_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_GET,       1, sensor_setting_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET,       1, sensor_setting_set_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET_UNACK, 1, sensor_setting_set_unack_rx},
+    BT_MESH_MODEL_OP_END,
+};
+
+#define sensor_setup_srv_model_pub_msg_length 3    // Lenght of publication messages
+BT_MESH_MODEL_PUB_DEFINE(sensor_setup_srv, NULL, sensor_setup_srv_model_pub_msg_length);
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -91,27 +103,16 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 
 // Cadence, Settings and Setting in Sensor Setup Server Model
 
-// sensor_srv_op[] in header
-// sensor_srv in header
-
-
 // Opcode
 static const struct bt_mesh_model_op sensor_srv_op[] = {
     {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET,    1, sensor_descriptor_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_DATA_GET,          1, sensor_data_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_COLUMN_GET,        1, sensor_column_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_SERIES_GET,        1, sensor_series_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_GET,       1, sensor_cadence_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET,       1, sensor_cadence_set_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET_UNACK, 1, sensor_cadence_set_unack_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_GET,      1, sensor_settings_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_GET,       1, sensor_setting_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET,       1, sensor_setting_set_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET_UNACK, 1, sensor_setting_set_unack_rx},
     BT_MESH_MODEL_OP_END,
 };
 
-#define sensor_model_pub_msg_length 3    // Lenght of publication messages
-BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_model_pub_msg_length);
+#define sensor_srv_model_pub_msg_length 3    // Lenght of publication messages
+BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_srv_model_pub_msg_length);
 
 #endif /* __SENSOR_SERVER_H */

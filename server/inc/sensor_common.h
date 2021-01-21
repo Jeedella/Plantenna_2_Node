@@ -3,10 +3,9 @@
 * File name:    sensor_client.h
 * Author:       Frank Arts
 * Date:         21-01-2021
-* Version:      V1.1
+* Version:      V1.2
 * Version info
-* - Added _t to all typedefs
-* - Added typedef for message packets
+* - Added error definitions
 */
 
 #ifndef __SENSOR_COMMON_H
@@ -14,6 +13,16 @@
 
 /* C standard includes */
 #include <stdint.h>
+
+// -------------------------------------------------------------------------------------------------------
+// Error definitions
+// --------------------------
+#define bt_mesh_SUCCEESS            0
+#define bt_mesh_ERROR              -1
+#define bt_mesh_PUBLISH_NOT_SET    -2
+#define bt_mesh_PUBLISH_FAILED     -3
+#define bt_mesh_SEND_FAILED        -4
+
 
 // -------------------------------------------------------------------------------------------------------
 // Opcode definitions

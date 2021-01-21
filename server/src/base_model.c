@@ -103,6 +103,7 @@ static struct bt_mesh_health_srv health_srv = {
 static struct bt_mesh_model sig_models[] = {
     BT_MESH_MODEL_CFG_SRV(&cfg_srv),
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
+	BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
     BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
     // If needed, add more models here //
 };

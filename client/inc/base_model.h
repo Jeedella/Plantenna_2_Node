@@ -20,4 +20,6 @@
 /* Functions */
 void spms_mesh_init(int err);
 
+static struct bt_mesh_model sig_models[3];
+
 #endif /* __BASE_MODEL_H */
