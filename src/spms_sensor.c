@@ -75,37 +75,48 @@ int sensor_init()
     return status;
 }
 
-// Read sensor data into local memory
+// Read sensor data into local memory 
+// note that printf is being used for debugging (uses more cpu and storage)
 int sensor_read(airflow_local* airflowMem) 
 {
-    int16_t tmp;
+    int16_t tmp_adc1;               // buffer to store adc channel 1 data
+    int16_t tmp_adc2;               // buffer to store adc channel 2 data
     double Vout; 
-    double offset = 1.210;
-    char Vout_string[MAX_STRING]; 
+    double offset = 1.210;          // ref voltage must be 3.3V
     struct sensor_value temp, humi, pres;
 
     struct adc_sequence sequence1 = {
 		.channels    = BIT(ADC_1ST_CHANNEL_ID),
-		.buffer      = &tmp,
-		.buffer_size = sizeof(tmp),
+		.buffer      = &tmp_adc1,
+		.buffer_size = sizeof(tmp_adc1),
 		.resolution  = ADC_RESOLUTION,
 		.oversampling = 0,	// don't oversample
 		.calibrate = 0		
 	};
+
+    struct adc_sequence sequence2 = {
+		.channels    = BIT(ADC_2ND_CHANNEL_ID),
+		.buffer      = &tmp_adc2,
+		.buffer_size = sizeof(tmp_adc2),
+		.resolution  = ADC_RESOLUTION,
+		.oversampling = 0,	// don't oversample
+		.calibrate = 0		
+	};    
     
     adc_read(devADC, &sequence1);
+    adc_read(devADC, &sequence2);
 
-    // calculate V airflow sensor
-    Vout = 3.3 * tmp * offset / 1023; 
+    // calculate voltage airflow sensor
+    Vout = 3.3 * tmp_adc1 * offset / 1023; 
     
     // Debug
-    sprintf(Vout_string, "%.3f", Vout);
-    printk("[Sensor] Vout :%s\n", Vout_string); 
+    printf("[Sensor] Vout %lf\n", Vout);
 
-    // calculate speed from V
+    // calculate speed from voltage
     airflowMem->airf = pow((((Vout - 1.30)/(3.038517*pow(25,0.115157)))/0.087288),3.009364)*0.44704;
 
-    printk("[Sensor] adc value :%d\n", tmp);
+    printk("[Sensor] adc value :%d\n", tmp_adc1);
+    printk("[Sensor] adc value :%d\n", tmp_adc2);   
     printk("[Sensor] airflow speed :%d\n", airflowMem->airf);
 
     if (devBME != NULL) {
