@@ -22,8 +22,17 @@
 #include <bluetooth/mesh/access.h>
 
 /* BT MESH Sensor Model includes */
+#include "base_model.h"
 #include "sensor_client.h"
 #include "sensor_common.h"
+
+// Variables
+bool publish = false;
+uint16_t reply_addr;
+uint8_t reply_net_idx;
+uint8_t reply_app_idx;
+uint8_t reply_send_ttl;
+struct bt_mesh_model *reply_model;
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -33,7 +42,7 @@
 
 
 // -------------------------------------------------------------------------------------------------------
-// Sensor Client Model (-> At least one must be supported!!!)
+// Sensor Client Model
 // --------------------------
 // sensor client - handler functions for this model's RX messages
 // Descriptor //
@@ -41,7 +50,7 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    // Optional -> not implemented
+    // Optional -> not implemented -> IMPLEMENT (because _get_tx is implemented)
     printk("Sensor Descriptor Status not implemented\n");
     return;
 }
@@ -93,7 +102,6 @@ void sensor_settings_status_rx(struct bt_mesh_model *model,
 {
     // Optional -> not implemented
     printk("Sensor Settings Status not implemented\n");
-    printk("Sensor Settings Status not implemented\n");
     return;
 }
 
@@ -114,19 +122,46 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 // -------------------------------------------------------------------------------------------------------
 // Sensor Client - TX message producer functions
 // -----------------------------------------------------------
-// Descriptor
-int sensor_descriptor_get_tx()
+// Descriptor (can only be published)
+int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id)
 {
-    // Optional -> not implemented
-    printk("Sensor Descriptor Get not implemented");
-    return 0;
+	printk("DEBUG: Staring sensor descriptor get tx. Continue\n");
+	
+	struct bt_mesh_model *model = &sig_models[2];
+	printk("DEBUG: Set pointer to sig_models[2] successfull. Continue\n");
+	
+	if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
+	{
+		printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
+		return bt_mesh_PUBLISH_NOT_SET;
+	}
+	printk("DEBUG: publish set correctly. Continue\n");
+	
+	struct net_buf_simple *msg = model->pub->msg;
+	printk("DEBUG: msg = model->pub->msg successfull. Continue\n");
+	
+	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET);
+	printk("DEBUG: bt mesh model msg init successfull. Continue\n");
+	
+	printk("Publishing descriptor get message...\n");
+	int err = bt_mesh_model_publish(model);
+	
+	if (err)
+	{
+		printk("bt_mesh_model_publish err %d\n", err);
+		return bt_mesh_PUBLISH_FAILED;
+	}
+	
+    // In test phase
+    printk("Sensor Descriptor Get message published/send without errors.\n");
+    return bt_mesh_SUCCEESS;
 }
 
 // Data
 int sensor_data_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Data Get not implemented");
+    printk("Sensor Data Get not implemented\n");
     return 0;
 }
 
@@ -134,7 +169,7 @@ int sensor_data_get_tx()
 int sensor_column_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Column Get not implemented");
+    printk("Sensor Column Get not implemented\n");
     return 0;
 }
 
@@ -142,7 +177,7 @@ int sensor_column_get_tx()
 int sensor_series_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Series Get not implemented");
+    printk("Sensor Series Get not implemented\n");
     return 0;
 }
 
@@ -150,21 +185,21 @@ int sensor_series_get_tx()
 int sensor_cadence_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Cadence Get not implemented");
+    printk("Sensor Cadence Get not implemented\n");
     return 0;
 }
 
 int sensor_cadence_set_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Cadence Set not implemented");
+    printk("Sensor Cadence Set not implemented\n");
     return 0;
 }
 
 int sensor_cadence_set_unack_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Cadence Set Unack not implemented");
+    printk("Sensor Cadence Set Unack not implemented\n");
     return 0;
 }
 
@@ -172,7 +207,7 @@ int sensor_cadence_set_unack_tx()
 int sensor_settings_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Settings Get not implemented");
+    printk("Sensor Settings Get not implemented\n");
     return 0;
 }
 
@@ -180,20 +215,20 @@ int sensor_settings_get_tx()
 int sensor_setting_get_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Setting Get not implemented");
+    printk("Sensor Setting Get not implemented\n");
     return 0;
 }
 
 int sensor_setting_set_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Setting Set not implemented");
+    printk("Sensor Setting Set not implemented\n");
     return 0;
 }
 
 int sensor_setting_set_unack_tx()
 {
     // Optional -> not implemented
-    printk("Sensor Setting Set Unack not implemented");
+    printk("Sensor Setting Set Unack not implemented\n");
     return 0;
 }

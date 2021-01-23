@@ -95,7 +95,7 @@ int init_SPMS()
 
 /* main */
 void main() {
-    printk("Plantenna 2.0 node - Client (test)\n");
+    printk("Plantenna 2.0 node - Server (test)\n");
 
     int err = bt_enable(spms_mesh_init);
     if (err) {
