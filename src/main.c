@@ -9,14 +9,16 @@
 * - Added bt mesh enable function
 */
 
-/* BLE */
 // SPMS
 #include "spms_libs.h"
-#include "spms_ble.h"
 #include "spms_sensor.h"
 
-// BT MESH base model (config + health) + other added models
-#include "base_model.h"
+#if defined(__SPMS_BT) && __SPMS_BT != 0
+    // BT MESH base model (config + health) + other added models
+    #include "mesh_base_model.h"
+#else
+    #include "spms_ble.h"
+#endif
 
 // Compiler macros
 #define HEAP_SIZE 512
@@ -37,7 +39,10 @@ void updateHandler()
     if(storageIndex < 512) {
         localStorage[storageIndex].time = timeStamp;
         sensor_read(&localStorage[storageIndex]);
+        
+        #if defined(__SPMS_BT) && !__SPMS_BT
         ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
+        #endif
         storageIndex++;
     }
     else printk("[Error] local storage out of memory\n");
@@ -70,7 +75,11 @@ int init_SPMS()
 
     // Bluetooth
     printk("[%s] bluetooth\n", strInit);
-    if(!bt_enable(NULL)) printk("%s %s bluetooth\n", strPass, strInit);
+    #if defined(__SPMS_BT) && __SPMS_BT != 0
+        if(!bt_enable(spms_mesh_init)) printk("%s %s bluetooth\n", strPass, strInit);
+    #else
+        if(!bt_enable(NULL)) printk("%s %s bluetooth\n", strPass, strInit);
+    #endif
     else {printk("%s %s bluetooth\n", strFail, strInit); status = status ^ ERROR;}
 
     // Start "update" timer, callback every minute
@@ -79,10 +88,12 @@ int init_SPMS()
     k_timer_start(&updateTimer, K_SECONDS(60), K_SECONDS(60));
     printk("%s %s update timer\n", strPass, strInit);
 
-    // Start advertising
-    printk("[%s] airflow advertising\n", strInit);
-    if(!ble_adv_start_airflow()) printk("%s %s airflow advertising\n", strPass, strInit);
-    else {printk("%s %s airflow advertising\n", strFail, strInit); status = status ^ WARNING;}
+    #if defined(__SPMS_BT) && !__SPMS_BT
+        // Start advertising
+        printk("[%s] airflow advertising\n", strInit);
+        if(!ble_adv_start_airflow()) printk("%s %s airflow advertising\n", strPass, strInit);
+        else {printk("%s %s airflow advertising\n", strFail, strInit); status = status ^ WARNING;}
+    #endif
 
     // Status check
     if (status & ERROR) {printk("[Error] Initialization failed\n"); return 1;}
@@ -92,25 +103,14 @@ int init_SPMS()
     return 0;
 }
 
-
 /* main */
 void main() {
-    printk("Plantenna 2.0 node - Server (test)\n");
+    printk("Plantenna 2.0 node - (test_build)\n");
 
-    int err = bt_enable(spms_mesh_init);
-    if (err) {
-        printk("bt_enable failed with err %d\n", err);
+    if(!init_SPMS()) {
+        printk("[Starting] Application\n");
+        updateHandler();
     }
-    
-    // if(!init_SPMS()) {
-        // printk("[Starting] Application\n");
-        // updateHandler();
-        // while(1)
-        // {
-
-        // }
-    // }
-    printk("[Stopping] Application\n");
-
+    //printk("[Stopping] Application\n");
     return;
 }

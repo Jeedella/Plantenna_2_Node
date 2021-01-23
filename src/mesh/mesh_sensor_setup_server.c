@@ -22,9 +22,9 @@
 #include <bluetooth/mesh/access.h>
 
 /* BT MESH Sensor Model includes */
-#include "base_model.h"
-#include "sensor_setup_server.h"
-#include "sensor_common.h"
+#include "mesh_base_model.h"
+#include "mesh_sensor_setup_server.h"
+#include "mesh_sensor_common.h"
 
 // Variables
 bool publish = false;
@@ -391,4 +391,3 @@ int sensor_series_status_tx()
 }
 
 // Cadence, Settings and Setting in Sensor Setup Server - TX message producer functions
-

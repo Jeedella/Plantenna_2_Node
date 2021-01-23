@@ -1,5 +1,5 @@
 /*
-* Plantenna 2 node - bt mesh base_model [client]
+* Plantenna 2 node - bt mesh base_model [(setup) server]
 * File name:    base_model.c
 * Author:       Frank Arts
 * Date:         20-01-2021
@@ -22,8 +22,13 @@
 
 // Includes
 #include "spms_libs.h"
-#include "base_model.h"
-#include "sensor_client.h"
+#include "mesh_base_model.h"
+
+#if defined(__SPMS_BT) && __SPMS_BT==1
+    #include "mesh_sensor_setup_server.h"
+#else
+    #include "mesh_sensor_client.h"
+#endif
 // If needed, add more header files for models here //
 
 /* BT MESH */
@@ -103,7 +108,12 @@ static struct bt_mesh_health_srv health_srv = {
 static struct bt_mesh_model sig_models[] = {
     BT_MESH_MODEL_CFG_SRV(&cfg_srv),
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
-    BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_CLI, sensor_cli_op, &sensor_cli, NULL),
+    #if defined(__SPMS_BT) && __SPMS_BT == 1
+        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
+        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
+    #else
+        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_CLI, sensor_cli_op, &sensor_cli, NULL),
+    #endif
     // If needed, add more models here //
 };
 

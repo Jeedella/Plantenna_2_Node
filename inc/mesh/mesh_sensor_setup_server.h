@@ -23,8 +23,7 @@
 #include <bluetooth/mesh/access.h>
 
 /* BT MESH Sensor Model includes */
-#include "sensor_common.h"
-
+#include "mesh_sensor_common.h"
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Setup Server Model

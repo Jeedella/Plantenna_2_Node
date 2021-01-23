@@ -1,5 +1,5 @@
 /*
-* Plantenna 2 node - bt mesh base_model [client]
+* Plantenna 2 node - bt mesh base_model [(setup) server]
 * File name:    base_model.h
 * Author:       Frank Arts
 * Date:         20-01-2021
@@ -14,12 +14,18 @@
 
 // Includes
 #include "spms_libs.h"
-#include "sensor_client.h"
+
+#if defined(__SPMS_BT) && __SPMS_BT==1
+    #include "mesh_sensor_setup_server.h"
+#else
+    #include "mesh_sensor_client.h"
+#endif
+
 // If needed, add more header files for models here //
 
 /* Functions */
 void spms_mesh_init(int err);
 
-static struct bt_mesh_model sig_models[3];
+static struct bt_mesh_model sig_models[4];
 
 #endif /* __BASE_MODEL_H */

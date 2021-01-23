@@ -22,9 +22,9 @@
 #include <bluetooth/mesh/access.h>
 
 /* BT MESH Sensor Model includes */
-#include "base_model.h"
-#include "sensor_client.h"
-#include "sensor_common.h"
+#include "mesh_base_model.h"
+#include "mesh_sensor_client.h"
+#include "mesh_sensor_common.h"
 
 // Variables
 bool publish = false;
