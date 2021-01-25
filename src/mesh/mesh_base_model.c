@@ -1,5 +1,5 @@
 /*
-* Plantenna 2 node - bt mesh base_model [(setup) server]
+* Plantenna 2 node - bt mesh base_model
 * File name:    base_model.c
 * Author:       Frank Arts
 * Date:         20-01-2021
@@ -26,10 +26,11 @@
 
 #if defined(__SPMS_BT) && __SPMS_BT==1
     #include "mesh_sensor_setup_server.h"
+	// If needed, add more header files for (setup) server models here //
 #else
     #include "mesh_sensor_client.h"
+	// If needed, add more header files for client models here //
 #endif
-// If needed, add more header files for models here //
 
 /* BT MESH */
 #include <bluetooth/bluetooth.h>

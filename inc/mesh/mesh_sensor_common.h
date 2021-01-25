@@ -2,10 +2,10 @@
 * Plantenna 2 node - bt mesh sensor common
 * File name:    sensor_client.h
 * Author:       Frank Arts
-* Date:         21-01-2021
-* Version:      V1.2
+* Date:         25-01-2021
+* Version:      V1.3
 * Version info
-* - Added error definitions
+* - Moved bt mesh error definitions to mesh_base_model.h
 */
 
 #ifndef __SENSOR_COMMON_H
@@ -13,15 +13,6 @@
 
 /* C standard includes */
 #include <stdint.h>
-
-// -------------------------------------------------------------------------------------------------------
-// Error definitions
-// --------------------------
-#define bt_mesh_SUCCEESS            0
-#define bt_mesh_ERROR              -1
-#define bt_mesh_PUBLISH_NOT_SET    -2
-#define bt_mesh_PUBLISH_FAILED     -3
-#define bt_mesh_SEND_FAILED        -4
 
 
 // -------------------------------------------------------------------------------------------------------
