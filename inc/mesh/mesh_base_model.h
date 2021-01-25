@@ -26,6 +26,6 @@
 /* Functions */
 void spms_mesh_init(int err);
 
-static struct bt_mesh_model sig_models[4];
+extern struct bt_mesh_model sig_models[];
 
 #endif /* __BASE_MODEL_H */

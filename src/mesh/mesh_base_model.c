@@ -105,7 +105,7 @@ static struct bt_mesh_health_srv health_srv = {
 // Composition
 // -----------
 // elements contain models (1 or more)
-static struct bt_mesh_model sig_models[] = {
+struct bt_mesh_model sig_models[] = {
     BT_MESH_MODEL_CFG_SRV(&cfg_srv),
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
     #if defined(__SPMS_BT) && __SPMS_BT == 1
