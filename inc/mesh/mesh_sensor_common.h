@@ -251,17 +251,17 @@ typedef sensor_column_status_msg_pkt_t_union sensor_column_status_msg_pkt_t;
 typedef union {
     sensor_series_state_short_t  short_pkt;
     sensor_series_state_middle_t middle_pkt;
-} sensor_seires_get_msg_pkt_t_union;
+} sensor_series_get_msg_pkt_t_union;
 
-typedef sensor_seires_get_msg_pkt_t_union sensor_seires_get_msg_pkt_t;
+typedef sensor_series_get_msg_pkt_t_union sensor_series_get_msg_pkt_t;
 
 // Status (Ch4.2.18)
 typedef union {
     sensor_series_state_short_t short_pkt;
     sensor_series_state_full_t  full_pkt;
-} sensor_seires_status_msg_pkt_t_union;
+} sensor_series_status_msg_pkt_t_union;
 
-typedef sensor_seires_status_msg_pkt_t_union sensor_seires_status_msg_pkt_t;
+typedef sensor_series_status_msg_pkt_t_union sensor_series_status_msg_pkt_t;
 
 
 // Sensor Cadence Message packets //

@@ -26,9 +26,11 @@
 
 #if defined(__SPMS_BT) && __SPMS_BT==1
     #include "mesh_sensor_setup_server.h"
+    #include "mesh_gen_onoff_server.h"
 	// If needed, add more header files for (setup) server models here //
 #else
     #include "mesh_sensor_client.h"
+    #include "mesh_gen_onoff_client.h"
 	// If needed, add more header files for client models here //
 #endif
 
@@ -112,8 +114,10 @@ struct bt_mesh_model sig_models[] = {
     #if defined(__SPMS_BT) && __SPMS_BT == 1
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
+        BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_SRV, gen_onoff_srv_op, &gen_onoff_srv, NULL),
     #else
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_CLI, sensor_cli_op, &sensor_cli, NULL),
+        BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_CLI, gen_onoff_cli_op, &gen_onoff_cli, NULL),
     #endif
     // If needed, add more models here //
 };

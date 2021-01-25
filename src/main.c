@@ -40,8 +40,22 @@ void updateHandler()
         localStorage[storageIndex].time = timeStamp;
         sensor_read(&localStorage[storageIndex]);
         
-        #if defined(__SPMS_BT) && !__SPMS_BT
-        ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
+        #if defined(__SPMS_BT)
+			#if !__SPMS_BT
+				ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
+			#elif __SPMS_BT==1
+				sensor_descriptor_status_msg_pkt_t status;
+				status.short_pkt.sensor_property_id = 0xFF;
+				
+				printk("Status msg sending...\n");
+				//sensor_descriptor_status_tx(true, status, true);
+				printk("Status msg sending done\n");
+			#else
+				printk("Get msg sending...\n");
+				genericOnOffGetTX();
+				//sensor_descriptor_get_tx(true, true);
+				printk("Get msg sending done\n");
+			#endif
         #endif
         storageIndex++;
     }
@@ -106,7 +120,7 @@ int init_SPMS()
 /* main */
 void main() {
     printk("Plantenna 2.0 node - (test_build)\n");
-
+	printk("SIZE: %d", sizeof(sensor_descriptor_get_msg_pkt_t));
     if(!init_SPMS()) {
         printk("[Starting] Application\n");
         updateHandler();
