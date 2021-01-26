@@ -86,7 +86,7 @@ The brief steps that need to be taken in order to setup an Ubuntu VM for setting
     ````
 8. Install net-tools and libncurses5 since these are required for the next steps:
     ````
-    sudo apt install net-tools libncurses5
+    sudo apt install net-tools libncurses5 srecord
     ````
 9. Check the VM's ip address using
     ````
