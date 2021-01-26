@@ -62,24 +62,18 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // Descriptor, Data, Column and Series in Sensor Server Model
 
 // Opcode
-static const struct bt_mesh_model_op sensor_setup_srv_op[] = {
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_GET,       sizeof(sensor_cadence_get_msg_pkt_t),       sensor_cadence_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET,       sizeof(sensor_cadence_set_msg_pkt_t),       sensor_cadence_set_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET_UNACK, sizeof(sensor_cadence_set_unack_msg_pkt_t), sensor_cadence_set_unack_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_GET,      sizeof(sensor_settings_get_msg_pkt_t),      sensor_settings_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_GET,       sizeof(sensor_setting_get_msg_pkt_t),       sensor_setting_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET,       sizeof(sensor_setting_set_msg_pkt_t),       sensor_setting_set_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET_UNACK, sizeof(sensor_setting_set_unack_msg_pkt_t), sensor_setting_set_unack_rx},
+static const struct bt_mesh_model_op sensor_setup_srv_op[] = {    // (UPDATE sizes)
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_GET,       1, sensor_cadence_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET,       1, sensor_cadence_set_rx},
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_SET_UNACK, 1, sensor_cadence_set_unack_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_GET,      1, sensor_settings_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_GET,       1, sensor_setting_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET,       1, sensor_setting_set_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_SET_UNACK, 1, sensor_setting_set_unack_rx},
     BT_MESH_MODEL_OP_END,
 };
 
-union all_setup_srv_tx_msg_structs {
-	sensor_cadence_status_msg_pkt_t  cadence_status;
-	sensor_settings_status_msg_pkt_t settings_status;
-	sensor_setting_status_msg_pkt_t  setting_status;
-};
-
-#define sensor_setup_srv_model_pub_msg_length sizeof(union all_setup_srv_tx_msg_structs)    // Lenght of publication messages -> max size of TX Message Packets (see mesh_sensor_common.h)
+#define sensor_setup_srv_model_pub_msg_length 2    // Lenght of publication messages (UPDATE ME)
 BT_MESH_MODEL_PUB_DEFINE(sensor_setup_srv, NULL, sensor_setup_srv_model_pub_msg_length);
 
 
@@ -109,25 +103,18 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 // Cadence, Settings and Setting in Sensor Setup Server Model
 
 // TX messasges (sensor server)
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool only_sensor_property_id);
+int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
 
 // Opcode
 static const struct bt_mesh_model_op sensor_srv_op[] = {
-    {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET, 0,                                       sensor_descriptor_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_DATA_GET,       sizeof(sensor_data_get_msg_pkt_t),       sensor_data_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_COLUMN_GET,     sizeof(sensor_column_get_msg_pkt_t),     sensor_column_get_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SERIES_GET,     sizeof(sensor_series_state_short_t),     sensor_series_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET, 0, sensor_descriptor_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_DATA_GET,       0, sensor_data_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_COLUMN_GET,     2, sensor_column_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SERIES_GET,     2, sensor_series_get_rx},
     BT_MESH_MODEL_OP_END,
 };
 
-union all_srv_tx_msg_structs {
-	sensor_descriptor_status_msg_pkt_t descriptor_status;
-	sensor_data_status_msg_pkt_t       data_status;
-	sensor_column_status_msg_pkt_t     column_status;
-	sensor_series_status_msg_pkt_t     series_status;
-};
-
-#define sensor_srv_model_pub_msg_length sizeof(union all_srv_tx_msg_structs)    // Lenght of publication messages -> max size of TX Message Packets (see mesh_sensor_common.h)
+#define sensor_srv_model_pub_msg_length 3    // Lenght of publication messages
 BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_srv_model_pub_msg_length);
 
 #endif /* __SENSOR_SERVER_H */

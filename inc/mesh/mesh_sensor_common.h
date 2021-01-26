@@ -2,10 +2,10 @@
 * Plantenna 2 node - bt mesh sensor common
 * File name:    sensor_client.h
 * Author:       Frank Arts
-* Date:         25-01-2021
-* Version:      V1.3
+* Date:         26-01-2021
+* Version:      V1.4
 * Version info
-* - Moved bt mesh error definitions to mesh_base_model.h
+* - Added indexes and property IDs for the used sensors
 */
 
 #ifndef __SENSOR_COMMON_H
@@ -70,6 +70,8 @@ typedef struct
     uint8_t  sensor_update_interval;            // Sensor update interval    (8 bits)
 } sensor_descriptor_state_full_t;
 
+typedef sensor_descriptor_state_full_t sensor_descriptor_state_global_t;
+
 
 // Sensor Data State (Ch4.1.4)
 typedef struct
@@ -103,10 +105,13 @@ typedef struct
     uint8_t raw_value;    // (Variable) Raw value field with a size and representation of the device property (8 bits)
 } sensor_data_state_single_t;
 
-typedef struct
+/*typedef struct
 {
     sensor_data_state_single_t* marshalled_sensor_data;    // (Variable) The Sensor Data state (variable bits)
-} sensor_data_state_multiple_t;
+} sensor_data_state_multiple_t;*/
+
+typedef sensor_data_state_single_t sensor_data_state_single_global_t;
+/*typedef sensor_data_state_multiple_t sensor_data_state_multiple_global_t;*/
 
 
 // Sensor Column State (Ch4.1.5)
@@ -124,8 +129,10 @@ typedef struct
     uint8_t  raw_value_y;     // (Variable) Raw value representing the height of a column on the Y axis (8 bits)
 } sensor_column_state_full_t;
 
+typedef sensor_column_state_full_t sensor_column_state_global_t;
 
-// Sensor Series State (Ch4.1.5)
+
+// Sensor Series State (None)
 typedef struct
 {
     uint16_t property_id;    // Property identifying a sensor (16 bits)
@@ -141,10 +148,19 @@ typedef struct
 typedef struct
 {
     uint16_t property_id;     // Property identifying a sensor (16 bits)
-    uint8_t* raw_value_x;     // (Variable) Raw value representing the left corner of the nth column on the X axis (8 bits)
-    uint8_t* column_width;    // (Variable) Raw value representing the width of a column (8 bits)
-    uint8_t* raw_value_y;     // (Variable) Raw valeu representing the height of the nth column on the Y axis (8 bits)
+    uint8_t  raw_value_x;     // (Variable) Raw value representing the left corner of the nth column on the X axis (8 bits)
+    uint8_t  column_width;    // (Variable) Raw value representing the width of a column (8 bits)
+    uint8_t  raw_value_y;     // (Variable) Raw valeu representing the height of the nth column on the Y axis (8 bits)
 } sensor_series_state_full_t;
+
+typedef struct
+{
+    uint16_t property_id;     // Property identifying a sensor (16 bits)
+    uint8_t  raw_value_x;     // (Variable) Raw value representing the left corner of the nth column on the X axis (8 bits)
+    uint8_t  raw_value_x2;    // (Variable) Raw value identifying an ending  column (8 bits)
+    uint8_t  column_width;    // (Variable) Raw value representing the width of a column (8 bits)
+    uint8_t  raw_value_y;     // (Variable) Raw valeu representing the height of the nth column on the Y axis (8 bits)
+} sensor_series_state_global_t;
 
 
 // Sensor Cadence State (Ch4.1.3)
@@ -165,6 +181,8 @@ typedef struct
     uint8_t  status_cadence_high;                // (Variable) High value of the fast cadence range (8 bits)
 } sensor_cadence_state_full_t;
 
+typedef sensor_cadence_state_full_t sensor_cadence_state_global_t;
+
 
 // Sensor Settings State (None)
 typedef struct
@@ -175,8 +193,10 @@ typedef struct
 typedef struct
 {
     uint16_t sensor_property_id;               // Property ID of the sensor (16 bits)
-    uint16_t sensor_setting_property_ids[];    // (Variable) A sequence of N Sensor Settign Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+    uint16_t sensor_setting_property_ids[];    // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
 } sensor_settings_state_full_t;
+
+typedef sensor_settings_state_full_t sensor_settings_state_global_t;
 
 
 // Sensor Setting State (Ch4.1.2)
@@ -201,6 +221,8 @@ typedef struct
     uint8_t  sensor_setting_raw[];          // (Variable) Raw value of a setting within the sensor (8 bits)
 } sensor_setting_state_full_t;
 
+typedef sensor_setting_state_full_t sensor_setting_state_global_t;
+
 // -------------------------------------------------------------------------------------------------------
 // Messsage packets (Ch4.2 MshMDLv1.0.1)
 // --------------------------
@@ -223,13 +245,14 @@ typedef sensor_descriptor_status_msg_pkt_t_union sensor_descriptor_status_msg_pk
 typedef sensor_data_state_short_t sensor_data_get_msg_pkt_t;
 
 // Status (Ch4.2.14)
-typedef union
+/*typedef union
 {
     sensor_data_state_single_t   single_sensor;
     sensor_data_state_multiple_t multiple_sensors;
 } sensor_data_status_msg_pkt_t_union;
 
-typedef sensor_data_status_msg_pkt_t_union sensor_data_status_msg_pkt_t;
+typedef sensor_data_status_msg_pkt_t_union sensor_data_status_msg_pkt_t;*/
+typedef sensor_data_state_single_t sensor_data_status_msg_pkt_t;    // For multiple, use an array: sensor_data_status_msg_pkt_t sensor_data_mulitple[no_sensors];
 
 
 // Sensor Column Message packets //
@@ -317,5 +340,23 @@ typedef union
 
 typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 
+
+// -------------------------------------------------------------------------------------------------------
+// Indexes and property IDs
+// --------------------------
+// Number of sensors
+#define no_sensors           4
+
+//Indexes (BME sensor as one sensor?)
+#define sensor_airflow_idx   0    // Airflow sensor
+#define sensor_bme_tmp_idx   1    // BME sensor - temperature
+#define sensor_bme_humid_idx 2    // BME sensor - humidity
+#define sensor_bme_pres_idx  3    // BME sensor - pressure
+
+// Sensor property IDs (UPDATE ME)
+#define sensor_airflow_property_id   0
+#define sensor_bme_tmp_property_id   1
+#define sensor_bme_humid_property_id 2
+#define sensor_bme_pres_property_id  3
 
 #endif /* __SENSOR_COMMON_H */

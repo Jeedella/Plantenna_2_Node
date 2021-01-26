@@ -2,11 +2,10 @@
 * Plantenna 2 node - bt mesh sensor setup server
 * File name:    sensor_setup_server.c
 * Author:       Frank Arts
-* Date:         20-01-2021
-* Version:      V1
+* Date:         26-01-2021
+* Version:      V1.1
 * Version info
-* - Created of file
-* - Added skeleton of bt mesh sensor setup server and server
+* - Added device data
 */
 
 /* C standard includes */
@@ -33,6 +32,32 @@ uint8_t reply_net_idx;
 uint8_t reply_app_idx;
 uint8_t reply_send_ttl;
 struct bt_mesh_model *reply_model;
+
+
+// -------------------------------------------------------------------------------------------------------
+// Device data
+// NOTE: Only one sensor/index can be send in a single message, except for Data.
+// --------------------------
+// Descriptor
+sensor_descriptor_state_global_t  sensor_decriptor_global[no_sensors];
+
+// Data
+sensor_data_state_single_global_t sensor_data_global[no_sensors];
+
+// Column
+sensor_column_state_global_t      sensor_column_global[no_sensors];
+
+// Series
+sensor_series_state_global_t      sensor_series_global[no_sensors];
+
+// Cadence
+sensor_cadence_state_global_t     sensor_cadence_global[no_sensors];
+
+// Settings (??? -> is this for a sensor with multiple sensors, like the BME sensor?)
+sensor_settings_state_global_t    sensor_settings_global[no_sensors];
+
+// Setting
+sensor_setting_state_global_t     sensor_setting_global[no_sensors];
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -125,7 +150,7 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // Sensor Server Model
 // --------------------------
 // Forward declarations of tx functions
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool only_sensor_property_id);
+int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
 int sensor_data_status_tx();
 int sensor_column_status_tx();
 int sensor_series_status_tx();
@@ -136,62 +161,39 @@ void sensor_descriptor_get_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-	bool only_sensor_property_id = true;
-	
-	if (model->id != BT_MESH_MODEL_ID_SENSOR_SRV || model->id != BT_MESH_MODEL_ID_SENSOR_SETUP_SRV)
-	{
-		printk("Model id %d, is not %d or %d", model->id, BT_MESH_MODEL_ID_SENSOR_SRV, BT_MESH_MODEL_ID_SENSOR_SETUP_SRV);
-		return;
-	}
-	
-	// Print for debug purposes + save
-	printk("ctx net_idx=0x%02x\n", ctx->net_idx);
-	printk("ctx app_idx=0x%02x\n", ctx->app_idx);
-	printk("ctx addr=0x%02x\n",    ctx->addr);
-	printk("ctx recv_dst=0x%02x\n",ctx->recv_dst);
-	
-	reply_addr     = ctx->addr;
-	reply_net_idx  = ctx->net_idx;
-	reply_app_idx  = ctx->app_idx;
-	reply_send_ttl = ctx->send_ttl;
-	
-	// Print for debug purposes
-	printk("Message: %d", *buf->data);
-	sensor_descriptor_status_msg_pkt_t sensor_descriptor_status_reply_msg;
-	
-	if (buf->len)    // Property ID field present -> send for single sensors
-	{
-		if (!*buf->data)    //  Sensor Property ID field is 0 (prohabited)
-		{
-			printk("Property ID field of 0 is prohabited. Message is discarded.\n");
-			return;
-		}
-		
-		// Save Property ID in sensor_descriptor_status_reply_msg
-		sensor_descriptor_status_reply_msg.short_pkt.sensor_property_id = *buf->data;
-		sensor_descriptor_status_reply_msg.full_pkt.sensor_property_id  = *buf->data;
-		
-		/* fill others */
-	}
-	else   // Property ID field omitted -> send for all sensor
-	{
-		/* ADD: for each sensor */
-		// Sensor Property ID is 0
-		sensor_descriptor_status_reply_msg.short_pkt.sensor_property_id = 0;
-		sensor_descriptor_status_reply_msg.full_pkt.sensor_property_id  = 0;
-		
-		/* fill others */
-	}
-		
-	// Send sensor_descriptor_status_tx messages
-	int err = sensor_descriptor_status_tx(true, sensor_descriptor_status_reply_msg, only_sensor_property_id);
-	
-	if (err)
-	{
-		printk("Sensor Descriptor Get rx processing failed with error %d", err);
-		return;
-	}
-	
+    bool only_sensor_property_id = true;
+    
+    if (model->id != (uint16_t)BT_MESH_MODEL_ID_SENSOR_SRV)
+    {
+        printk("Model id %d, is not %d\n", model->id, BT_MESH_MODEL_ID_SENSOR_SRV);
+        return;
+    }
+    
+    // Print for debug purposes + save
+    printk("ctx net_idx=0x%02x\n", ctx->net_idx);
+    printk("ctx app_idx=0x%02x\n", ctx->app_idx);
+    printk("ctx addr=0x%02x\n",    ctx->addr);
+    printk("ctx recv_dst=0x%02x\n",ctx->recv_dst);
+    
+    reply_addr     = ctx->addr;
+    reply_net_idx  = ctx->net_idx;
+    reply_app_idx  = ctx->app_idx;
+    reply_send_ttl = ctx->send_ttl;
+    
+    // Print for debug purposes
+    printk("Message: %x. Property ID field present (1) or omitted (0)\n", *buf->data);
+	bool is_multiple_sensors = *buf->data;
+    sensor_descriptor_status_msg_pkt_t (*sensor_descriptor_status_reply_msg)[no_sensors] = &sensor_decriptor_global;
+    
+    // Send sensor_descriptor_status_tx messages
+    int err = sensor_descriptor_status_tx(true, **sensor_descriptor_status_reply_msg, is_multiple_sensors, only_sensor_property_id);
+    
+    if (err)
+    {
+        printk("Sensor Descriptor Get rx processing failed with error %d", err);
+        return;
+    }
+    
     // In test phase
     printk("Sensor Descriptor Get processed without errors\n");
     return;
@@ -265,102 +267,102 @@ int sensor_setting_status_tx()
 // Sensor Server - TX message producer functions
 // -----------------------------------------------------------
 // Descriptor
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool only_sensor_property_id)
+int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id)
 {
-	struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
-	
-	if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
-	{
-		printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
-		return bt_mesh_PUBLISH_NOT_SET;
-	}
-	
-	if (publish)
-	{
-		struct net_buf_simple *msg = model->pub->msg;
-		net_buf_simple_reset(msg);
-		bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
-		if (status.short_pkt.sensor_property_id)    // Not 0 -> send single
-		{
-			if (only_sensor_property_id)    // single | all? -> only send Sensor Property ID | send all
-			{
-				net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
-			}
-			else
-			{
-				net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
-			}
-		}
-		else
-		{
-			if (only_sensor_property_id)    // single | all? -> only send Sensor Property ID | send all
-			{
-				net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
-			}
-			else
-			{
-				net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
-			}
-		}
-		
-		printk("Publishing descriptor status message...\n");
-		int err = bt_mesh_model_publish(model);
-		
-		if (err)
-		{
-			printk("bt_mesh_model_publish err %d\n", err);
-			return bt_mesh_PUBLISH_FAILED;
-		}
-	}
-	else
-	{
-		uint8_t buflen = sizeof(status.full_pkt);
-		NET_BUF_SIMPLE_DEFINE(msg, buflen);
-		bt_mesh_model_msg_init(&msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
-		
-		if (only_sensor_property_id)    // single | all? -> only send Sensor Property ID | send all
-		{
-			buflen = sizeof(status.short_pkt);
-			
-			if (status.short_pkt.sensor_property_id)    // Not 0 -> send for single sensor
-			{
-				net_buf_simple_add_mem(&msg, &status.short_pkt, buflen);
-			}
-			else
-			{
-				/* ADD: for multiple sensors */
-			}
-		}
-		else
-		{
-			if (status.full_pkt.sensor_property_id)    // Not 0 -> send for single sensor
-			{
-				net_buf_simple_add_mem(&msg, &status.full_pkt, buflen);
-			}
-			else
-			{
-				/* ADD: for multiple sensors */
-			}
-		}
-		
-		struct bt_mesh_msg_ctx ctx = {
-			.net_idx  = reply_net_idx,
-			.app_idx  = reply_app_idx,
-			.addr     = reply_addr,
-			.send_ttl = reply_send_ttl,
-			};
-	
-		printk("Sending descriptor status message...\n");
-		
-		int err = bt_mesh_model_send(model, &ctx, &msg, NULL, NULL);
-		
-		if (err)
-		{
-			printk("Unable to send descriptor status message. Error: %d\n", err);
-			return bt_mesh_SEND_FAILED;
-		}
-	}
-	
+    struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
+    
+    if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
+    {
+        printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
+        return bt_mesh_PUBLISH_NOT_SET;
+    }
+    
+    if (publish)
+    {
+        struct net_buf_simple *msg = model->pub->msg;
+        net_buf_simple_reset(msg);
+        bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
+        if (!is_multiple_sensors)    // Not 0 -> send for single sensor
+        {
+            if (only_sensor_property_id)    // ID only | all? -> only send Sensor Property ID | send all
+            {
+                net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
+            }
+            else
+            {
+                net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
+            }
+        }
+        else    // 0 -> send for all sensors
+        {
+            if (only_sensor_property_id)    // ID only | all? -> only send Sensor Property ID | send all
+            {
+                net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
+            }
+            else
+            {
+                net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
+            }
+        }
+        
+        printk("Publishing descriptor status message...\n");
+        int err = bt_mesh_model_publish(model);
+        
+        if (err)
+        {
+            printk("bt_mesh_model_publish err %d\n", err);
+            return bt_mesh_PUBLISH_FAILED;
+        }
+    }
+    else
+    {
+        uint8_t buflen = sizeof(status.full_pkt);
+        NET_BUF_SIMPLE_DEFINE(msg, buflen);
+        bt_mesh_model_msg_init(&msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
+        
+        if (only_sensor_property_id)    // single | all? -> only send Sensor Property ID | send all
+        {
+            buflen = sizeof(status.short_pkt);
+            
+            if (status.short_pkt.sensor_property_id)    // Not 0 -> send for single sensor
+            {
+                net_buf_simple_add_mem(&msg, &status.short_pkt, buflen);
+            }
+            else
+            {
+                /* ADD: for multiple sensors */
+            }
+        }
+        else
+        {
+            if (status.full_pkt.sensor_property_id)    // Not 0 -> send for single sensor
+            {
+                net_buf_simple_add_mem(&msg, &status.full_pkt, buflen);
+            }
+            else
+            {
+                /* ADD: for multiple sensors */
+            }
+        }
+        
+        struct bt_mesh_msg_ctx ctx = {
+            .net_idx  = reply_net_idx,
+            .app_idx  = reply_app_idx,
+            .addr     = reply_addr,
+            .send_ttl = reply_send_ttl,
+            };
+    
+        printk("Sending descriptor status message...\n");
+        
+        int err = bt_mesh_model_send(model, &ctx, &msg, NULL, NULL);
+        
+        if (err)
+        {
+            printk("Unable to send descriptor status message. Error: %d\n", err);
+            return bt_mesh_SEND_FAILED;
+        }
+    }
+    
     // In test phase
     printk("Sensor Descriptor Status message published/send without errors.\n");
     return bt_mesh_SUCCEESS;

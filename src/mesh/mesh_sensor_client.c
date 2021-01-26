@@ -2,11 +2,10 @@
 * Plantenna 2 node - bt mesh sensor client
 * File name:    sensor_client.c
 * Author:       Frank Arts
-* Date:         20-01-2021
-* Version:      V1
+* Date:         26-01-2021
+* Version:      V1.1
 * Version info
-* - Created of file
-* - Added skeleton of bt mesh sensor client
+* - Added device data
 */
 
 /* C standard includes */
@@ -36,6 +35,32 @@ struct bt_mesh_model *reply_model;
 
 
 // -------------------------------------------------------------------------------------------------------
+// Device data
+// NOTE: Only one sensor/index can be send in a single message, except for Data.
+// --------------------------
+// Descriptor
+sensor_descriptor_state_global_t  sensor_decriptor_global[no_sensors];
+
+// Data
+sensor_data_state_single_global_t sensor_data_global[no_sensors];
+
+// Column
+sensor_column_state_global_t      sensor_column_global[no_sensors];
+
+// Series
+sensor_series_state_global_t      sensor_series_global[no_sensors];
+
+// Cadence
+sensor_cadence_state_global_t     sensor_cadence_global[no_sensors];
+
+// Settings
+sensor_settings_state_global_t    sensor_settings_global[no_sensors];
+
+// Setting
+sensor_setting_state_global_t     sensor_setting_global[no_sensors];
+
+
+// -------------------------------------------------------------------------------------------------------
 // Sensor functions
 // --------------------------
 // < sensor functions > //
@@ -50,6 +75,15 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
+	if (model->id != (uint16_t)BT_MESH_MODEL_ID_SENSOR_CLI)
+	{
+		printk("Model id %d, is not %d\n", model->id, BT_MESH_MODEL_ID_SENSOR_SRV);
+		return;
+	}
+	
+	// Print for debug purposes
+	printk("Message: %x\n", *buf->data);
+	
     // Optional -> not implemented -> IMPLEMENT (because _get_tx is implemented)
     printk("Sensor Descriptor Status not implemented\n");
     return;
@@ -125,23 +159,17 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 // Descriptor (can only be published)
 int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id)
 {
-	printk("DEBUG: Staring sensor descriptor get tx. Continue\n");
-	
 	struct bt_mesh_model *model = &sig_models[2];
-	printk("DEBUG: Set pointer to sig_models[2] successfull. Continue\n");
 	
 	if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
 	{
 		printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
 		return bt_mesh_PUBLISH_NOT_SET;
 	}
-	printk("DEBUG: publish set correctly. Continue\n");
 	
 	struct net_buf_simple *msg = model->pub->msg;
-	printk("DEBUG: msg = model->pub->msg successfull. Continue\n");
 	
 	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET);
-	printk("DEBUG: bt mesh model msg init successfull. Continue\n");
 	
 	printk("Publishing descriptor get message...\n");
 	int err = bt_mesh_model_publish(model);
