@@ -59,7 +59,6 @@ sensor_settings_state_global_t    sensor_settings_global[no_sensors];
 // Setting
 sensor_setting_state_global_t     sensor_setting_global[no_sensors];
 
-
 // -------------------------------------------------------------------------------------------------------
 // Sensor functions
 // --------------------------
@@ -151,7 +150,7 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // --------------------------
 // Forward declarations of tx functions
 int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
-int sensor_data_status_tx();
+int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 int sensor_column_status_tx();
 int sensor_series_status_tx();
 
@@ -204,9 +203,20 @@ void sensor_data_get_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    // Not implemented yet
-    printk("Sensor Data Get not implemented yet\n");
-    return;
+    uint16_t prop_id = net_buf_simple_pull_le16(buf);
+    printk("Received prop id: %d\n", prop_id);
+
+    if(!prop_id || prop_id < 0x800) {
+        printk("Invalid property_id");
+        return;
+    }
+
+    if(!sensor_data_status_tx(ctx, prop_id)) {
+        printk("Sensor Data Get processed without errors\n");
+    }
+    else {
+        printk("Sensor Data Get processed with errors\n");
+    }
 }
 
 // Column //
@@ -369,11 +379,51 @@ int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t
 }
 
 // Data
-int sensor_data_status_tx()
+int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
-    // Not implemented yet
-    printk("Sensor Data Status not implemented yet\n");
-    return 0;
+    struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
+	struct net_buf_simple *msg = model->pub->msg;
+	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DATA_STATUS);
+
+    airflow_local sensor_data;
+    get_sensor_series_index(get_local_storage_index() - 1, &sensor_data);
+
+    uint16_t marshalled_id = prop_id ^ 0x2000;
+    uint16_t sensor_raw;
+
+    switch(prop_id) {
+        case sensor_airflow_property_id:
+            sensor_raw = sensor_data.airf;
+            break;
+        case sensor_bme_tmp_property_id:
+            sensor_raw = sensor_data.temp;
+            break;
+        case sensor_bme_humid_property_id:
+            sensor_raw = sensor_data.humi;
+            break;
+        case sensor_bme_pres_property_id:
+            sensor_raw = sensor_data.pres;
+            break;
+        default:
+            break;
+    }
+
+    printk("Val marshall: %d\n", marshalled_id);
+    printk("Val sensor: %d\n", sensor_raw);
+
+    unsigned payload = ((unsigned)marshalled_id << 16) | (unsigned)sensor_raw;
+    printk("Created payload: %d\n", payload);
+
+    net_buf_simple_add_le32(msg, payload);
+
+    if(!bt_mesh_model_send(model, ctx, msg, NULL, NULL)) {
+        printk("Sensor data status message published/send without errors.\n");
+        return bt_mesh_SUCCEESS;
+    } 
+    else {
+        printk("Sensor data status message published/send with errors.\n");
+        return bt_mesh_SEND_FAILED;
+    }
 }
 
 // Column

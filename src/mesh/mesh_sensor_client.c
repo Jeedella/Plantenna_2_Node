@@ -94,8 +94,13 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    // Optional -> not implemented
-    printk("Sensor Data Status not implemented\n");
+    unsigned payload = net_buf_simple_pull_le32(buf);
+    uint16_t marshall = (uint16_t)(payload >> 16);
+    uint16_t sensor_data = (uint16_t)(payload);
+
+    printk("Received sensor_data: %d\n", payload);
+    printk("Received marshall: %d\n", marshall);
+    printk("Received sensor: %d\n", sensor_data);
     return;
 }
 
@@ -186,11 +191,33 @@ int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id)
 }
 
 // Data
-int sensor_data_get_tx()
+int sensor_data_get_tx(uint16_t property_id)
 {
-    // Optional -> not implemented
-    printk("Sensor Data Get not implemented\n");
-    return 0;
+    struct bt_mesh_model *model = &sig_models[2];
+	
+	if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
+	{
+		printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
+		return bt_mesh_PUBLISH_NOT_SET;
+	}
+
+	struct net_buf_simple *msg = model->pub->msg;
+	
+	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DATA_GET);
+    net_buf_simple_add_le16(msg, property_id);
+	
+	printk("Publishing descriptor get message...\n");
+	int err = bt_mesh_model_publish(model);
+	
+	if (err) {
+		printk("bt_mesh_model_publish err %d\n", err);
+		return bt_mesh_PUBLISH_FAILED;
+    }
+    else {
+        printk("Sensor Descriptor Get message published/send without errors.\n");
+	}
+	
+    return bt_mesh_SUCCEESS;
 }
 
 // Column

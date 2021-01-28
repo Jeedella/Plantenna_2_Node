@@ -81,15 +81,15 @@ typedef struct
 
 typedef struct
 {
-    uint8_t  format      : 1;     // Foramt A tag, 0b0 (1 bit)
-    uint8_t  lenght      : 4;     // Length of the Property Value  (4 bits)
+    uint8_t  format      : 1;     // Format A tag, 0b0 (1 bit)
+    uint8_t  length      : 4;     // Length of the Property Value  (4 bits)
     uint16_t property_id : 11;    // Property identifying a sensor (11 bits)
 } MPID_A_t; // Foramt A (short)
 
 typedef struct
 {
-    uint8_t  format      : 1;    // Foramt A tag, 0b1 (1 bit)
-    uint8_t  lenght      : 7;    // Length of the Property Value  (7 bits)
+    uint8_t  format      : 1;    // Format A tag, 0b1 (1 bit)
+    uint8_t  length      : 7;    // Length of the Property Value  (7 bits)
     uint16_t property_id;        // Property identifying a sensor (16 bits)
 } MPID_B_t; // Format B (long)
 
@@ -344,7 +344,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 // -------------------------------------------------------------------------------------------------------
 // Indexes and property IDs
 // --------------------------
-// Number of sensors
+// Number of sensors and thus number of states
 #define no_sensors           4
 
 //Indexes (BME sensor as one sensor?)
@@ -353,10 +353,10 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define sensor_bme_humid_idx 2    // BME sensor - humidity
 #define sensor_bme_pres_idx  3    // BME sensor - pressure
 
-// Sensor property IDs (UPDATE ME)
-#define sensor_airflow_property_id   0
-#define sensor_bme_tmp_property_id   1
-#define sensor_bme_humid_property_id 2
-#define sensor_bme_pres_property_id  3
+// Sensor property IDs (UPDATE ME) (see https://specificationrefs.bluetooth.com/assigned-values/Appearance%20Values.pdf)
+#define sensor_airflow_property_id   0x550 // Id of wind sensor
+#define sensor_bme_tmp_property_id   0x543 // Id of temperature sensor
+#define sensor_bme_humid_property_id 0x544 // Id of humidity sensor
+#define sensor_bme_pres_property_id  0x553 // Id of unused sensor
 
 #endif /* __SENSOR_COMMON_H */

@@ -114,7 +114,7 @@ static const struct bt_mesh_model_op sensor_srv_op[] = {
     BT_MESH_MODEL_OP_END,
 };
 
-#define sensor_srv_model_pub_msg_length 3    // Lenght of publication messages
+#define sensor_srv_model_pub_msg_length 2    // Lenght of publication messages
 BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_srv_model_pub_msg_length);
 
 #endif /* __SENSOR_SERVER_H */

@@ -12,6 +12,7 @@
 // SPMS
 #include "spms_libs.h"
 #include "spms_sensor.h"
+#include "mesh_sensor_common.h"
 
 #if defined(__SPMS_BT) && __SPMS_BT != 0
     // BT MESH base model (config + health) + other added models
@@ -20,29 +21,25 @@
     #include "spms_ble.h"
 #endif
 
-// Compiler macros
-#define HEAP_SIZE 512
-
 // globals
-static airflow_local* localStorage;
 static struct k_timer updateTimer;
-static unsigned storageIndex = 0;
 
 // Timer expire handler
 void updateHandler()
 {
     unsigned timeStamp = (unsigned)k_uptime_ticks();
+    airflow_local sensor_data;
 
     printk("[Time] Timer expired at %d\n", timeStamp);
-    printk("[Log] Current storage index is %d\n", storageIndex);
+    printk("[Log] Current storage index is %d\n", get_local_storage_index());
 
-    if(storageIndex < 512) {
-        localStorage[storageIndex].time = timeStamp;
-        sensor_read(&localStorage[storageIndex]);
-        
+    sensor_data.time = timeStamp;
+    sensor_read(&sensor_data);
+
+    if(!add_sensor_series(sensor_data)) {
         #if defined(__SPMS_BT)
 			#if !__SPMS_BT
-				ble_update_airflow(&localStorage[storageIndex], (uint8_t)sys_rand32_get());
+				ble_update_airflow(&sensor_data, (uint8_t)sys_rand32_get());
 			#elif __SPMS_BT==1
 				sensor_descriptor_status_msg_pkt_t status;
 				status.short_pkt.sensor_property_id = 0xFF;
@@ -52,12 +49,11 @@ void updateHandler()
 				printk("Status msg sending done\n");
 			#else
 				printk("Get msg sending...\n");
-				genericOnOffGetTX();
 				//sensor_descriptor_get_tx(true, true);
+                sensor_data_get_tx(sensor_bme_tmp_property_id);
 				printk("Get msg sending done\n");
 			#endif
         #endif
-        storageIndex++;
     }
     else printk("[Error] local storage out of memory\n");
 }
@@ -78,8 +74,7 @@ int init_SPMS()
 
     // Local storage
     printk("[%s] local storage\n", strInit);
-    localStorage = k_malloc(HEAP_SIZE * sizeof(airflow_local));
-    if (localStorage != NULL) printk("%s %s local storage\n", strPass, strInit);
+    if (!local_storage_init()) printk("%s %s local storage\n", strPass, strInit);
     else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
 
     // ADC / sensors
@@ -120,7 +115,6 @@ int init_SPMS()
 /* main */
 void main() {
     printk("Plantenna 2.0 node - (test_build)\n");
-	printk("SIZE: %d", sizeof(sensor_descriptor_get_msg_pkt_t));
     if(!init_SPMS()) {
         printk("[Starting] Application\n");
         updateHandler();
