@@ -345,7 +345,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 // Indexes and property IDs
 // --------------------------
 // Number of sensors and thus number of states
-#define no_sensors           4
+#define no_sensors           5
 
 //Indexes (BME sensor as one sensor?)
 #define sensor_airflow_idx   0    // Airflow sensor
@@ -358,5 +358,6 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define sensor_bme_tmp_property_id   0x543 // Id of temperature sensor
 #define sensor_bme_humid_property_id 0x544 // Id of humidity sensor
 #define sensor_bme_pres_property_id  0x553 // Id of unused sensor
+#define sensor_battery_property_id   0x554 // Id of unused sensor
 
 #endif /* __SENSOR_COMMON_H */

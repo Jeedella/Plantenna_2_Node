@@ -50,7 +50,7 @@ void updateHandler()
 			#else
 				printk("Get msg sending...\n");
 				//sensor_descriptor_get_tx(true, true);
-                sensor_data_get_tx(sensor_bme_tmp_property_id);
+                sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
 			#endif
         #endif

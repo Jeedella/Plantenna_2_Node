@@ -150,7 +150,6 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // --------------------------
 // Forward declarations of tx functions
 int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
-int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 int sensor_column_status_tx();
 int sensor_series_status_tx();
 
@@ -203,12 +202,15 @@ void sensor_data_get_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    uint16_t prop_id = net_buf_simple_pull_le16(buf);
-    printk("Received prop id: %d\n", prop_id);
+	uint16_t buflen = buf->len;
+	uint16_t prop_id = 0;
 
-    if(!prop_id || prop_id < 0x800) {
-        printk("Invalid property_id");
-        return;
+	if (buflen) {
+		prop_id = net_buf_simple_pull_le16(buf);
+        printk("Received prop id: %d\n", prop_id);
+	}
+    else {
+        printk("Received no prop id, so reply with all sensors\n", prop_id);
     }
 
     if(!sensor_data_status_tx(ctx, prop_id)) {
@@ -381,42 +383,67 @@ int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t
 // Data
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
+    const static uint16_t id_lookup[no_sensors] = {
+        0,
+        sensor_bme_tmp_property_id,
+        sensor_bme_humid_property_id,
+        sensor_bme_pres_property_id,
+        sensor_battery_property_id
+    };
+    const static uint16_t add_MIPDA = 0x2000;
+
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
-	struct net_buf_simple *msg = model->pub->msg;
-	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DATA_STATUS);
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DATA_STATUS);
 
     airflow_local sensor_data;
     get_sensor_series_index(get_local_storage_index() - 1, &sensor_data);
 
-    uint16_t marshalled_id = prop_id ^ 0x2000;
-    uint16_t sensor_raw;
+    int payload_length;
+    if(prop_id) payload_length = 4;    // Length marshall type A + sensor_raw (1 sensor)
+    else payload_length = no_sensors << 2;    // No_sensors * length 1 sensor(4)
+    uint16_t payload[payload_length >> 1];    // Uint16_t so divide by 2
+    printk("Reply message has length is: %d\n", payload_length);
 
-    switch(prop_id) {
-        case sensor_airflow_property_id:
-            sensor_raw = sensor_data.airf;
-            break;
-        case sensor_bme_tmp_property_id:
-            sensor_raw = sensor_data.temp;
-            break;
-        case sensor_bme_humid_property_id:
-            sensor_raw = sensor_data.humi;
-            break;
-        case sensor_bme_pres_property_id:
-            sensor_raw = sensor_data.pres;
-            break;
-        default:
-            break;
+    for(int k = 0; k < (payload_length >> 2); k++) {
+        switch(id_lookup[k] ^ prop_id) {
+            case 0:
+            case sensor_airflow_property_id:
+                payload[k << 1] = sensor_airflow_property_id ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.airf;
+                break;
+            case sensor_bme_tmp_property_id:
+                payload[k << 1] = sensor_bme_tmp_property_id ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.temp;
+                break;
+            case sensor_bme_humid_property_id:
+                payload[k << 1] = sensor_bme_humid_property_id ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.humi;
+                break;
+            case sensor_bme_pres_property_id:
+                payload[k << 1] = sensor_bme_pres_property_id ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.pres;
+                break;
+            case sensor_battery_property_id:
+                payload[k << 1] = sensor_battery_property_id ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.batt;
+                break;
+            default:
+                printk("Invalid property ID");
+                return bt_mesh_SEND_FAILED;
+        }
+        printk("Val marshall[%d]: %d\n", k, payload[k << 1]);
+        printk("Val sensor[%d]: %d\n", k, payload[(k << 1) + 1]);
     }
 
-    printk("Val marshall: %d\n", marshalled_id);
-    printk("Val sensor: %d\n", sensor_raw);
+    struct bt_mesh_msg_ctx *sensor_status_ctx = ctx;
+    if(payload_length > 11) {
+        sensor_status_ctx->send_rel = true;
+    }
 
-    unsigned payload = ((unsigned)marshalled_id << 16) | (unsigned)sensor_raw;
-    printk("Created payload: %d\n", payload);
+    net_buf_simple_add_mem(msg, payload, payload_length);
 
-    net_buf_simple_add_le32(msg, payload);
-
-    if(!bt_mesh_model_send(model, ctx, msg, NULL, NULL)) {
+    if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
     } 

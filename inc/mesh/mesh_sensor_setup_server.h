@@ -104,6 +104,7 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 
 // TX messasges (sensor server)
 int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
+int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 
 // Opcode
 static const struct bt_mesh_model_op sensor_srv_op[] = {
@@ -114,7 +115,7 @@ static const struct bt_mesh_model_op sensor_srv_op[] = {
     BT_MESH_MODEL_OP_END,
 };
 
-#define sensor_srv_model_pub_msg_length 2    // Lenght of publication messages
+#define sensor_srv_model_pub_msg_length 3    // Lenght of publication messages
 BT_MESH_MODEL_PUB_DEFINE(sensor_srv, NULL, sensor_srv_model_pub_msg_length);
 
 #endif /* __SENSOR_SERVER_H */

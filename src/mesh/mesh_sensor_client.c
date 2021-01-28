@@ -94,13 +94,14 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    unsigned payload = net_buf_simple_pull_le32(buf);
-    uint16_t marshall = (uint16_t)(payload >> 16);
-    uint16_t sensor_data = (uint16_t)(payload);
+	uint16_t buflen = buf->len;
+    uint16_t* payload = net_buf_simple_pull_mem(buf, buflen);
+    printk("Received payload with size: %d\n", buflen);
 
-    printk("Received sensor_data: %d\n", payload);
-    printk("Received marshall: %d\n", marshall);
-    printk("Received sensor: %d\n", sensor_data);
+    for(int k = 0; k < (buflen >> 2); k++) {
+        printk("Marshall[%d]: %d\n", k, payload[k << 1]);
+        printk("Raw data[%d]: %d\n", k, payload[(k << 1) + 1]);
+    }
     return;
 }
 
@@ -190,7 +191,7 @@ int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id)
     return bt_mesh_SUCCEESS;
 }
 
-// Data
+// Get sensor data from the server
 int sensor_data_get_tx(uint16_t property_id)
 {
     struct bt_mesh_model *model = &sig_models[2];
@@ -202,9 +203,11 @@ int sensor_data_get_tx(uint16_t property_id)
 	}
 
 	struct net_buf_simple *msg = model->pub->msg;
-	
 	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DATA_GET);
-    net_buf_simple_add_le16(msg, property_id);
+	
+    if(property_id) {
+        net_buf_simple_add_le16(msg, property_id);
+    }
 	
 	printk("Publishing descriptor get message...\n");
 	int err = bt_mesh_model_publish(model);
