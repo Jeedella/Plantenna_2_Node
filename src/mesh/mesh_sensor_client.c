@@ -39,25 +39,25 @@ struct bt_mesh_model *reply_model;
 // NOTE: Only one sensor/index can be send in a single message, except for Data.
 // --------------------------
 // Descriptor
-sensor_descriptor_state_global_t  sensor_decriptor_global[no_sensors];
+sensor_descriptor_state_global_t  sensor_decriptor_global[NO_SENSORS];
 
 // Data
-sensor_data_state_single_global_t sensor_data_global[no_sensors];
+sensor_data_state_single_global_t sensor_data_global[NO_SENSORS];
 
 // Column
-sensor_column_state_global_t      sensor_column_global[no_sensors];
+sensor_column_state_global_t      sensor_column_global[NO_SENSORS];
 
 // Series
-sensor_series_state_global_t      sensor_series_global[no_sensors];
+sensor_series_state_global_t      sensor_series_global[NO_SENSORS];
 
 // Cadence
-sensor_cadence_state_global_t     sensor_cadence_global[no_sensors];
+sensor_cadence_state_global_t     sensor_cadence_global[NO_SENSORS];
 
 // Settings
-sensor_settings_state_global_t    sensor_settings_global[no_sensors];
+sensor_settings_state_global_t    sensor_settings_global[NO_SENSORS];
 
 // Setting
-sensor_setting_state_global_t     sensor_setting_global[no_sensors];
+sensor_setting_state_global_t     sensor_setting_global[NO_SENSORS];
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -75,15 +75,18 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-	if (model->id != (uint16_t)BT_MESH_MODEL_ID_SENSOR_CLI)
-	{
-		printk("Model id %d, is not %d\n", model->id, BT_MESH_MODEL_ID_SENSOR_SRV);
-		return;
-	}
-	
-	// Print for debug purposes
-	printk("Message: %x\n", *buf->data);
-	
+    // Print 2 lines to see different messages better
+    printk("\n\n");
+    
+    if (model->id != (uint16_t)BT_MESH_MODEL_ID_SENSOR_CLI)
+    {
+        printk("Model id %d, is not %d\n", model->id, BT_MESH_MODEL_ID_SENSOR_SRV);
+        return;
+    }
+    
+    // Print for debug purposes
+    printk("Message: %d\n", *buf->data);
+    
     // Optional -> not implemented -> IMPLEMENT (because _get_tx is implemented)
     printk("Sensor Descriptor Status not implemented\n");
     return;
@@ -163,29 +166,35 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 // Sensor Client - TX message producer functions
 // -----------------------------------------------------------
 // Descriptor (can only be published)
-int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id)
+int sensor_descriptor_get_tx(uint16_t sensor_property_id)
 {
-	struct bt_mesh_model *model = &sig_models[2];
-	
-	if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
-	{
-		printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
-		return bt_mesh_PUBLISH_NOT_SET;
-	}
-	
-	struct net_buf_simple *msg = model->pub->msg;
-	
-	bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET);
-	
-	printk("Publishing descriptor get message...\n");
-	int err = bt_mesh_model_publish(model);
-	
-	if (err)
-	{
-		printk("bt_mesh_model_publish err %d\n", err);
-		return bt_mesh_PUBLISH_FAILED;
-	}
-	
+    struct bt_mesh_model *model = &sig_models[2];
+    
+    if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
+    {
+        printk("No publish address associated with the sensor client model - add one with a configuration app like nRF Mesh\n");
+        return bt_mesh_PUBLISH_NOT_SET;
+    }
+    
+    // Init msg
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET);
+    
+    if (sensor_property_id)    // Not 0 -> send for single sensor (sensor's property id is specified)
+    {
+        // Add property ID to message
+        net_buf_simple_add_le16(msg, sensor_property_id);
+    }
+    
+    printk("Publishing descriptor get message...\n");
+    int err = bt_mesh_model_publish(model);
+    
+    if (err)
+    {
+        printk("bt_mesh_model_publish err %d\n", err);
+        return bt_mesh_PUBLISH_FAILED;
+    }
+    
     // In test phase
     printk("Sensor Descriptor Get message published/send without errors.\n");
     return bt_mesh_SUCCEESS;
@@ -218,8 +227,8 @@ int sensor_data_get_tx(uint16_t property_id)
     }
     else {
         printk("Sensor Descriptor Get message published/send without errors.\n");
-	}
-	
+    }
+    
     return bt_mesh_SUCCEESS;
 }
 

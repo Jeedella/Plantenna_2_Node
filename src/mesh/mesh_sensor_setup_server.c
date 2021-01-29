@@ -2,10 +2,10 @@
 * Plantenna 2 node - bt mesh sensor setup server
 * File name:    sensor_setup_server.c
 * Author:       Frank Arts
-* Date:         26-01-2021
-* Version:      V1.1
+* Date:         28-01-2021
+* Version:      V1.2
 * Version info
-* - Added device data
+* - Added sensor functions
 */
 
 /* C standard includes */
@@ -39,30 +39,205 @@ struct bt_mesh_model *reply_model;
 // NOTE: Only one sensor/index can be send in a single message, except for Data.
 // --------------------------
 // Descriptor
-sensor_descriptor_state_global_t  sensor_decriptor_global[no_sensors];
+sensor_descriptor_state_global_t  sensor_decriptor_global[NO_SENSORS];
 
 // Data
-sensor_data_state_single_global_t sensor_data_global[no_sensors];
+sensor_data_state_single_global_t sensor_data_global[NO_SENSORS];
 
 // Column
-sensor_column_state_global_t      sensor_column_global[no_sensors];
+sensor_column_state_global_t      sensor_column_global[NO_SENSORS];
 
 // Series
-sensor_series_state_global_t      sensor_series_global[no_sensors];
+sensor_series_state_global_t      sensor_series_global[NO_SENSORS];
 
 // Cadence
-sensor_cadence_state_global_t     sensor_cadence_global[no_sensors];
+sensor_cadence_state_global_t     sensor_cadence_global[NO_SENSORS];
 
 // Settings (??? -> is this for a sensor with multiple sensors, like the BME sensor?)
-sensor_settings_state_global_t    sensor_settings_global[no_sensors];
+sensor_settings_state_global_t    sensor_settings_global[NO_SENSORS];
 
 // Setting
-sensor_setting_state_global_t     sensor_setting_global[no_sensors];
+sensor_setting_state_global_t     sensor_setting_global[NO_SENSORS];
+
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor functions
 // --------------------------
-// < sensor functions > //
+// Local storages
+static sensor_model_cadence_local cadenceLocalStorage[NO_SENSORS];
+const int sensor_cadence_heap_size = sizeof(cadenceLocalStorage);
+
+static sensor_model_settings_local settingsLocalStorage[NO_SENSORS];
+const int sensor_settings_heap_size = sizeof(settingsLocalStorage);
+
+static sensor_model_setting_local settingLocalStorage[NO_SENSORS];
+const int sensor_setting_heap_size = sizeof(settingLocalStorage);
+
+static sensor_model_descriptor_local descriptorLocalStorage[NO_SENSORS];
+const int sensor_descriptor_heap_size = sizeof(descriptorLocalStorage);
+
+
+int init_sensor_model_local_storage() // TODO: Fill in all data members, except sensor_property_id
+{
+    int fail = 0b0;
+    
+    // Cadence
+    #ifdef STATE_CADENCE
+        // Airflow sensor //
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].sensor_property              = SENSOR_AIRFLOW_PROP_ID;    // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].fast_cadence_period_divisor  = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_trigger_type          = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_trigger_delta_down    = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_trigger_delta_up      = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_min_interval          = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_cadence_low           = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_AIRFLOW_IDX].status_cadence_high          = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+        
+        // BME temperature sensor //
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].sensor_property             = SENSOR_BME_TEMP_PROP_ID;   // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].fast_cadence_period_divisor = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_trigger_type         = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_trigger_delta_down   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_trigger_delta_up     = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_BME_TEMP_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+        
+        // BME humidity sensor //
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].sensor_property             = SENSOR_BME_HUMI_PROP_ID;   // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].fast_cadence_period_divisor = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_trigger_type         = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_trigger_delta_down   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_trigger_delta_up     = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_BME_HUMI_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+        
+        // BME pressure sensor //
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].sensor_property             = SENSOR_BME_PRES_PROP_ID;   // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].fast_cadence_period_divisor = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_trigger_type         = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_trigger_delta_down   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_trigger_delta_up     = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+    #endif
+    
+    
+    // Settings
+    #ifdef STATE_SETTINGS
+        // Airflow sensor //
+        settingsLocalStorage[SENSOR_AIRFLOW_IDX].sensor_property_id      = SENSOR_AIRFLOW_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_AIRFLOW_IDX].sensor_setting_raw[]  = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+        
+        // BME temperature sensor //
+        settingsLocalStorage[SENSOR_BME_TEMP_IDX].sensor_property_id     = SENSOR_BME_TEMP_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_BME_TEMP_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+        
+        // BME humidity sensor //
+        settingsLocalStorage[SENSOR_BME_HUMI_IDX].sensor_property_id     = SENSOR_BME_HUMI_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_BME_HUMI_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+        
+        // BME pressure sensor //
+        settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id     = SENSOR_BME_PRES_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+    #endif
+    
+    
+    // Setting
+    #ifdef STATE_SETTING
+        // Airflow sensor //
+        settingLocalStorage[SENSOR_AIRFLOW_IDX].sensor_property_id          = SENSOR_AIRFLOW_PROP_ID;    // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_AIRFLOW_IDX].sensor_setting_property_id  = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_AIRFLOW_IDX].sensor_setting_access       = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_AIRFLOW_IDX].sensor_setting_raw[]        = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+        
+        // BME temperature sensor //
+        settingLocalStorage[SENSOR_BME_TEMP_IDX].sensor_property_id         = SENSOR_BME_TEMP_PROP_ID;   // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_TEMP_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_TEMP_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_BME_TEMP_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+        
+        // BME humidity sensor //
+        settingLocalStorage[SENSOR_BME_HUMI_IDX].sensor_property_id         = SENSOR_BME_HUMI_PROP_ID;   // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_HUMI_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_HUMI_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_BME_HUMI_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+        
+        // BME pressure sensor //
+        settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id         = SENSOR_BME_PRES_PROP_ID;   // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+    #endif
+    
+    
+    // Descriptor
+    #ifdef STATE_DESCRIPTOR
+        // Airflow sensor //
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_property_id         = SENSOR_AIRFLOW_PROP_ID;    // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_positive_tolerance  = 0;                         // Divisor for the Publish Period (7 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_negative_tolerance  = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_sampling_function   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_measurement_period  = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_update_interval     = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        
+        // BME temperature sensor //
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_property_id        = SENSOR_BME_TEMP_PROP_ID;   // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        
+        // BME humidity sensor //
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_property_id        = SENSOR_BME_HUMI_PROP_ID;   // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        
+        // BME pressure sensor //
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id        = SENSOR_BME_PRES_PROP_ID;   // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+    #endif
+    
+    return fail;
+}
+
+int get_data_sensor_model_local_storage(int sensor_idx, int state, sensor_model_local* sensor_data)
+{
+    switch(state)
+    {
+        case STATE_CADENCE:
+            memcpy(sensor_data, &cadenceLocalStorage[sensor_idx], sizeof(sensor_model_cadence_local));
+            break;
+        
+        case STATE_SETTINGS:
+            memcpy(sensor_data, &settingsLocalStorage[sensor_idx], sizeof(sensor_model_settings_local));
+            break;
+        
+        case STATE_SETTING:
+            memcpy(sensor_data, &settingLocalStorage[sensor_idx], sizeof(sensor_model_setting_local));
+            break;
+        
+        case STATE_DESCRIPTOR:
+            memcpy(sensor_data, &descriptorLocalStorage[sensor_idx], sizeof(sensor_model_descriptor_local));
+            break;
+        
+        default:
+            return -1;
+    }
+    
+    return 0;
+}
+
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Setup Server Model
@@ -149,7 +324,7 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // Sensor Server Model
 // --------------------------
 // Forward declarations of tx functions
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
+int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id);
 int sensor_column_status_tx();
 int sensor_series_status_tx();
 
@@ -159,7 +334,8 @@ void sensor_descriptor_get_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
-    bool only_sensor_property_id = true;
+    // Print 2 lines to see different messages better
+    printk("\n\n");
     
     if (model->id != (uint16_t)BT_MESH_MODEL_ID_SENSOR_SRV)
     {
@@ -178,13 +354,34 @@ void sensor_descriptor_get_rx(struct bt_mesh_model *model,
     reply_app_idx  = ctx->app_idx;
     reply_send_ttl = ctx->send_ttl;
     
-    // Print for debug purposes
-    printk("Message: %x. Property ID field present (1) or omitted (0)\n", *buf->data);
-	bool is_multiple_sensors = *buf->data;
-    sensor_descriptor_status_msg_pkt_t (*sensor_descriptor_status_reply_msg)[no_sensors] = &sensor_decriptor_global;
+    // Default value of sensor_property_id is -1 (-> send for all sensors)
+    int sensor_property_id = -1;
+    
+    bool only_sensor_property_id = true;
+    
+    if (buf->len)    // Property ID field present -> send for specified sensor
+    {
+		// Pull prop_id from buf
+		sensor_property_id = net_buf_simple_pull_le16(buf);
+		
+        if (!sensor_property_id)    //  Sensor Property ID field is 0 (prohabited)
+        {
+            printk("Property ID field of 0 is prohabited. Message is discarded.\n");
+            return;
+        }
+    
+        // Print prop_id
+        printk("Received prop id = 0x%x\n", sensor_property_id);
+        
+        if (buf->len > 2)    // More than sensor property id was send
+        {
+            only_sensor_property_id = false;
+        }
+    }
     
     // Send sensor_descriptor_status_tx messages
-    int err = sensor_descriptor_status_tx(true, **sensor_descriptor_status_reply_msg, is_multiple_sensors, only_sensor_property_id);
+    bool publish = true;
+    int err = sensor_descriptor_status_tx(publish, sensor_property_id, only_sensor_property_id);
     
     if (err)
     {
@@ -279,103 +476,96 @@ int sensor_setting_status_tx()
 // Sensor Server - TX message producer functions
 // -----------------------------------------------------------
 // Descriptor
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id)
+int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id)
 {
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
     
     if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
     {
-        printk("No publish address associated with the generic on off server model - add one with a configuration app like nRF Mesh\n");
+        printk("No publish address associated with the sensor server model - add one with a configuration app like nRF Mesh\n");
         return bt_mesh_PUBLISH_NOT_SET;
     }
     
-    if (publish)
+    // Init msg
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
+    
+    // Collect data member(s) and save in msg
+    if (!only_sensor_property_id)    // Collect all data members
     {
-        struct net_buf_simple *msg = model->pub->msg;
-        net_buf_simple_reset(msg);
-        bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
-        if (!is_multiple_sensors)    // Not 0 -> send for single sensor
+        // Local variables
+        int state = STATE_DESCRIPTOR;
+        sensor_model_local descriptor[NO_SENSORS];
+        int sensor_idx;
+        
+        switch (sensor_property_id)
         {
-            if (only_sensor_property_id)    // ID only | all? -> only send Sensor Property ID | send all
-            {
-                net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
-            }
-            else
-            {
-                net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
-            }
-        }
-        else    // 0 -> send for all sensors
-        {
-            if (only_sensor_property_id)    // ID only | all? -> only send Sensor Property ID | send all
-            {
-                net_buf_simple_add_mem(msg, &status.short_pkt, sizeof(status.short_pkt));
-            }
-            else
-            {
-                net_buf_simple_add_mem(msg, &status.full_pkt, sizeof(status.full_pkt));
-            }
+            case SENSOR_AIRFLOW_PROP_ID:
+                sensor_idx = SENSOR_AIRFLOW_IDX;
+                break;
+            case SENSOR_BME_TEMP_PROP_ID:
+                printk("HERE");
+                sensor_idx = SENSOR_BME_TEMP_IDX;
+                break;
+            case SENSOR_BME_HUMI_PROP_ID:
+                sensor_idx = SENSOR_BME_HUMI_IDX;
+                break;
+            case SENSOR_BME_PRES_PROP_ID:
+                sensor_idx = SENSOR_BME_PRES_IDX;
+                break;
+            case -1:    // Send for all sensors
+                sensor_idx = -1;
+                break;;
+            default:    // Unknown sensor_property_id -> Omit this request
+                return -1;
         }
         
-        printk("Publishing descriptor status message...\n");
-        int err = bt_mesh_model_publish(model);
-        
-        if (err)
+        if (sensor_idx)    // Save data for selected sensor_index
         {
-            printk("bt_mesh_model_publish err %d\n", err);
+            get_data_sensor_model_local_storage(sensor_idx, state, descriptor);
+            net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
+        }
+        else    // Save data for all sensor_indexes
+        {
+            for (int i = sensor_idx; i < NO_SENSORS; i++) {
+                get_data_sensor_model_local_storage(i, state, descriptor);
+                net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
+            }
+        }
+    }
+    else    // Collect only sensor property id
+    {
+        
+    }
+    
+    if (publish)    // Publish msg
+    {
+        printk("Publishing descriptor get message...\n");
+        
+        if(bt_mesh_model_publish(model))
+        {
             return bt_mesh_PUBLISH_FAILED;
         }
     }
-    else
+    else    // Send msg
     {
-        uint8_t buflen = sizeof(status.full_pkt);
-        NET_BUF_SIMPLE_DEFINE(msg, buflen);
-        bt_mesh_model_msg_init(&msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
-        
-        if (only_sensor_property_id)    // single | all? -> only send Sensor Property ID | send all
-        {
-            buflen = sizeof(status.short_pkt);
-            
-            if (status.short_pkt.sensor_property_id)    // Not 0 -> send for single sensor
-            {
-                net_buf_simple_add_mem(&msg, &status.short_pkt, buflen);
-            }
-            else
-            {
-                /* ADD: for multiple sensors */
-            }
-        }
-        else
-        {
-            if (status.full_pkt.sensor_property_id)    // Not 0 -> send for single sensor
-            {
-                net_buf_simple_add_mem(&msg, &status.full_pkt, buflen);
-            }
-            else
-            {
-                /* ADD: for multiple sensors */
-            }
-        }
-        
+        // Get and save ctx
         struct bt_mesh_msg_ctx ctx = {
             .net_idx  = reply_net_idx,
             .app_idx  = reply_app_idx,
             .addr     = reply_addr,
             .send_ttl = reply_send_ttl,
             };
-    
+        
+        // Send message
         printk("Sending descriptor status message...\n");
         
-        int err = bt_mesh_model_send(model, &ctx, &msg, NULL, NULL);
-        
-        if (err)
+        if(bt_mesh_model_send(model, &ctx, msg, NULL, NULL))
         {
-            printk("Unable to send descriptor status message. Error: %d\n", err);
             return bt_mesh_SEND_FAILED;
         }
     }
     
-    // In test phase
     printk("Sensor Descriptor Status message published/send without errors.\n");
     return bt_mesh_SUCCEESS;
 }

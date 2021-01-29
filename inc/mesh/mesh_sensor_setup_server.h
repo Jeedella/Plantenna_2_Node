@@ -2,11 +2,10 @@
 * Plantenna 2 node - bt mesh sensor setup server
 * File name:    sensor_setup_server.h
 * Author:       Frank Arts
-* Date:         20-01-2021
-* Version:      V1
+* Date:         28-01-2021
+* Version:      V1.2
 * Version info
-* - Created of file
-* - Added skeleton of bt mesh sensor setup server and server
+* - Added sensor functions
 */
 
 #ifndef __SENSOR_SERVER_H
@@ -24,6 +23,52 @@
 
 /* BT MESH Sensor Model includes */
 #include "mesh_sensor_common.h"
+
+// -------------------------------------------------------------------------------------------------------
+// Sensor functions
+// --------------------------
+// Local storage
+// Storage structs //
+typedef sensor_cadence_state_full_t    sensor_model_cadence_local;
+typedef sensor_settings_state_full_t   sensor_model_settings_local;
+typedef sensor_setting_state_full_t    sensor_model_setting_local;
+typedef sensor_descriptor_state_full_t sensor_model_descriptor_local;
+typedef union
+{
+	sensor_model_cadence_local    cadence[NO_SENSORS];
+	sensor_model_settings_local   settings[NO_SENSORS];
+	sensor_model_setting_local    setting[NO_SENSORS];
+	sensor_model_descriptor_local descriptor[NO_SENSORS];
+} sensor_model_local;
+
+// Enum of storage names //
+typedef enum {cadence, settings, setting, descriptor } sensor_storage_names;
+
+// States
+#define STATE_CADENCE    0
+#define STATE_SETTINGS   1
+#define STATE_SETTING    2
+#define STATE_DESCRIPTOR 3
+
+// Functions //
+// Initialize all sensor model local storages
+/*
+    returns 0 for each successful initialization
+	returns 1 for each failed     initialization
+*/
+int init_sensor_model_local_storage();
+
+// Get a sensor model local storage entry at a specific storage index
+/*
+    sensor_idx  = index value of the requested sensor
+	state_idx   = index value of the requested state, i.e. cadence
+	sensor_data = data to which the sensor model local storage entry is copied to
+	
+	returns  0 when no errors have occured
+	returns -1 otherwise
+*/
+int get_data_sensor_model_local_storage(int sensor_idx, int state_idx, sensor_model_local* sensor_data);
+
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Setup Server Model
@@ -103,7 +148,7 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 // Cadence, Settings and Setting in Sensor Setup Server Model
 
 // TX messasges (sensor server)
-int sensor_descriptor_status_tx(bool publish, sensor_descriptor_status_msg_pkt_t status, bool is_multiple_sensors, bool only_sensor_property_id);
+int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id);
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 
 // Opcode

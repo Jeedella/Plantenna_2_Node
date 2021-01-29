@@ -67,7 +67,14 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 
 
 // TX messages
-int sensor_descriptor_get_tx(bool single_sensor, bool only_sensor_property_id);
+// Get sensor descirptor from the server
+/*
+    property_id =   Id of the requested sensor data as defined in mesh_sensor_common.h
+                    When the requested property id is 0, all available sensors are requested.
+
+    returns 0 when no errors have occurred
+*/
+int sensor_descriptor_get_tx(bool single_sensor);
 
 // Get sensor data from the server
 /*
@@ -88,21 +95,6 @@ static const struct bt_mesh_model_op sensor_cli_op[] = {
     {BT_MESH_MODEL_OP_SENSOR_SETTINGS_STATUS,   sizeof(sensor_settings_state_short_t),   sensor_settings_status_rx},
     {BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS,    sizeof(sensor_setting_state_short_t),    sensor_setting_status_rx},
     BT_MESH_MODEL_OP_END,
-};
-
-union all_cli_tx_msg_structs {
-	sensor_cadence_get_msg_pkt_t       cadence_get;
-	sensor_cadence_set_msg_pkt_t       cadence_set;
-	sensor_cadence_set_unack_msg_pkt_t cadence_set_unack;
-	sensor_settings_get_msg_pkt_t      settings_get;
-	sensor_setting_get_msg_pkt_t       setting_get;
-	sensor_setting_set_msg_pkt_t       setting_set;
-	sensor_setting_set_unack_msg_pkt_t setting_set_unack;
-	
-	sensor_descriptor_get_msg_pkt_t    descriptor_get;
-	sensor_data_get_msg_pkt_t          data_get;
-	sensor_column_get_msg_pkt_t        column_get;
-	sensor_series_get_msg_pkt_t        series_get;
 };
 
 #define sensor_model_pub_msg_length 3    // Lenght of publication messages -> max size of TX Message Packets (see mesh_sensor_common.h)

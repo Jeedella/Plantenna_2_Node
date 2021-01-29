@@ -176,7 +176,7 @@ typedef struct
     uint8_t  status_trigger_type         : 1;    // Defines the unit and format of the Status Trigger Delta filed (1 bit)
     uint8_t  status_trigger_delta_down;          // (Variable) Delta down value that triggters a status message   (8 bits)
     uint8_t  status_trigger_delta_up;            // (Variable) Delta up   value that triggters a status message   (8 bits)
-    uint8_t  status_min_interval         : 8;    // Minimum interval between two consecutive Status messages (8 bits)
+    uint8_t  status_min_interval;                // Minimum interval between two consecutive Status messages (8 bits)
     uint8_t  status_cadence_low;                 // (Variable) Low  value of the fast cadence range (8 bits)
     uint8_t  status_cadence_high;                // (Variable) High value of the fast cadence range (8 bits)
 } sensor_cadence_state_full_t;
@@ -345,19 +345,20 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 // Indexes and property IDs
 // --------------------------
 // Number of sensors and thus number of states
-#define no_sensors           5
+#define NO_SENSORS 5
 
-//Indexes (BME sensor as one sensor?)
-#define sensor_airflow_idx   0    // Airflow sensor
-#define sensor_bme_tmp_idx   1    // BME sensor - temperature
-#define sensor_bme_humid_idx 2    // BME sensor - humidity
-#define sensor_bme_pres_idx  3    // BME sensor - pressure
+// Indexes
+#define SENSOR_AIRFLOW_IDX   0    // Wind sensor
+#define SENSOR_BME_TEMP_IDX  1    // BME sensor - temperature
+#define SENSOR_BME_HUMI_IDX  2    // BME sensor - humidity
+#define SENSOR_BME_PRES_IDX  3    // BME sensor - pressure
+#define SENSOR_BATTERY_IDX   4    // BME sensor - pressure
 
-// Sensor property IDs (UPDATE ME) (see https://specificationrefs.bluetooth.com/assigned-values/Appearance%20Values.pdf)
-#define sensor_airflow_property_id   0x550 // Id of wind sensor
-#define sensor_bme_tmp_property_id   0x543 // Id of temperature sensor
-#define sensor_bme_humid_property_id 0x544 // Id of humidity sensor
-#define sensor_bme_pres_property_id  0x553 // Id of unused sensor
-#define sensor_battery_property_id   0x554 // Id of unused sensor
+// Sensor property IDs (see https://specificationrefs.bluetooth.com/assigned-values/Appearance%20Values.pdf)
+#define SENSOR_AIRFLOW_PROP_ID  0x550 // Id of wind sensor
+#define SENSOR_BME_TEMP_PROP_ID 0x543 // Id of temperature sensor
+#define SENSOR_BME_HUMI_PROP_ID 0x544 // Id of humidity sensor
+#define SENSOR_BME_PRES_PROP_ID 0x553 // Id of unused sensor
+#define SENSOR_BATTERY_PROP_ID  0x554 // Id of unused sensor
 
 #endif /* __SENSOR_COMMON_H */
