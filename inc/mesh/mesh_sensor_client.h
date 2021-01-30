@@ -74,7 +74,7 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 
     returns 0 when no errors have occurred
 */
-int sensor_descriptor_get_tx(bool single_sensor);
+int sensor_descriptor_get_tx(uint16_t sensor_property_id);
 
 // Get sensor data from the server
 /*
