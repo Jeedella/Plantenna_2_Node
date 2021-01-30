@@ -65,8 +65,8 @@ typedef struct
     uint16_t sensor_property_id;                // Property ID of the sensor (16 bits)
     uint16_t sensor_positive_tolerance : 12;    // Sensor positive tolerance (12 bits)
     uint16_t sensor_negative_tolerance : 12;    // Sensor negative tolerance (12 bits)
-    uint8_t  sensor_sampling_function;          // Sensor sampling funcciton (8 bits)
-    uint8_t  sensor_measurement_period;         // Sensor measuremtn period  (8 bits)
+    uint8_t  sensor_sampling_function;          // Sensor sampling function  (8 bits)
+    uint8_t  sensor_measurement_period;         // Sensor measuremnt period  (8 bits)
     uint8_t  sensor_update_interval;            // Sensor update interval    (8 bits)
 } sensor_descriptor_state_full_t;
 

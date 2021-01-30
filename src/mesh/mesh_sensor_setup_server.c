@@ -182,35 +182,35 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
     #ifdef STATE_DESCRIPTOR
         // Airflow sensor //
         descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_property_id         = SENSOR_AIRFLOW_PROP_ID;    // Property ID of the sensor (16 bits)
-        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_positive_tolerance  = 0;                         // Divisor for the Publish Period (7 bits)
-        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_negative_tolerance  = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
-        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_sampling_function   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_measurement_period  = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_update_interval     = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_positive_tolerance  = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_negative_tolerance  = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_sampling_function   = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_measurement_period  = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_AIRFLOW_IDX].sensor_update_interval     = 4;                         // Sensor update interval    (8 bits)
         
         // BME temperature sensor //
         descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_property_id        = SENSOR_BME_TEMP_PROP_ID;   // Property ID of the sensor (16 bits)
-        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
-        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
-        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_positive_tolerance = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_negative_tolerance = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_TEMP_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
         
         // BME humidity sensor //
         descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_property_id        = SENSOR_BME_HUMI_PROP_ID;   // Property ID of the sensor (16 bits)
-        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
-        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
-        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_positive_tolerance = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_negative_tolerance = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_HUMI_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
         
         // BME pressure sensor //
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id        = SENSOR_BME_PRES_PROP_ID;   // Property ID of the sensor (16 bits)
-        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_positive_tolerance = 0;                         // Divisor for the Publish Period (7 bits)
-        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_negative_tolerance = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
-        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
-        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_positive_tolerance = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_negative_tolerance = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
     #else
         fail += 0b1 << 3;
     #endif
@@ -552,7 +552,7 @@ int sensor_setting_status_tx()
 // -------------------------------------------------------------------------------------------------------
 // Sensor Server - TX message producer functions
 // -----------------------------------------------------------
-// Descriptor (works only for publish = true and only_sensor_property_id = true. All other options fail during publish/send, due to some size error)
+// Descriptor (get error while sending/publishing with: send (publish = false), and all members for all sensors (only_sensor_property_id = false and sensor_property_id = SENSOR_ALL_PROP_ID (=0xFFFF)))
 int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool only_sensor_property_id)
 {
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
@@ -589,17 +589,17 @@ int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool 
         if (sensor_idx != SENSOR_ALL_IDX)    // Save data for selected sensor_index
         {
             get_data_sensor_model_local_storage(sensor_idx, state, descriptor);
-            net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
-            payload_length = sensor_descriptor_heap_size;
+            net_buf_simple_add_mem(msg, descriptor, sizeof(sensor_model_descriptor_local));
+            payload_length = sizeof(sensor_model_descriptor_local);
             printk("All descriptor members for one sensors (prop_id = 0x%x) will be returned\n", sensor_property_id);
         }
         else    // Save data for all sensor_indexes
         {
             for (int idx = 0; idx < NO_SENSORS; idx++) {
                 get_data_sensor_model_local_storage(idx, state, descriptor);
-                net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
+                net_buf_simple_add_mem(msg, descriptor, sizeof(sensor_model_descriptor_local));
             }
-            payload_length = sensor_descriptor_heap_size * NO_SENSORS;
+            payload_length = sizeof(sensor_model_descriptor_local) * NO_SENSORS;
             printk("All descriptor members for all sensors will be returned\n");
         }
     }

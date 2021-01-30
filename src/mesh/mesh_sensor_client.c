@@ -123,18 +123,21 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
     {
         for (int i = 0; i < (buflen >> 1); i++) {
             printk("Sensor property id [%d] = 0x%x\n", i, payload[i]);
+            printk("\n");
         }
     }
     else if (buflen == sz_descriptor_full ||                 // all descriptor members of one sensor
              buflen == (NO_SENSORS * sz_descriptor_full))    // all descriptor members of all sensors
     {
-        for (int i = 0; i < (buflen >> 1); i ++) {
-            printk("Property id[%d]        = 0x%x\n", i, payload[i]);
-            printk("Positive tolerance[%d] = %d\n", i, payload[i + 1]);
-            printk("Negative tolerance[%d] = %d\n", i, payload[i + 2]);
-            printk("Sampling function[%d]  = %d\n", i, payload[(i << 1) + 3]);
-            printk("Measurment period[%d]  = %d\n", i, payload[(i << 1) + 4]);
-            printk("Update interval[%d]    = %d\n", i, payload[(i << 1) + 5]);
+        for (int i = 0; i < ((buflen >> 2) - 1); i ++) {
+            printk("Property id[%d]        = 0x%x\n", i, payload[(i << 4)]); 
+            printk("Positive tolerance[%d] = %d\n", i, payload[(i << 4) + 1]);
+            printk("Negative tolerance[%d] = %d\n", i, payload[(i << 4) + 2]);
+            char* nxt = &payload[(i << 4) + 3];
+            printk("Sampling function[%d]  = %d\n", i, nxt[0]);
+            printk("Measurment period[%d]  = %d\n", i, nxt[1]);
+            printk("Update interval[%d]    = %d\n", i, payload[(i << 4) + 4]);
+            printk("\n");
         }
     }
     
