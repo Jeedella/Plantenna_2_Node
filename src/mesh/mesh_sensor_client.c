@@ -84,11 +84,60 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
         return;
     }
     
-    // Print for debug purposes
-    printk("Message: %d\n", *buf->data);
+    uint16_t buflen = buf->len;
+    uint16_t* payload = net_buf_simple_pull_mem(buf, buflen);
+    printk("Received payload with size: %d\n", buflen);
+
+    const size_t sz_sensor_prop_id  = sizeof(sensor_descriptor_state_short_t);
+    const size_t sz_descriptor_full = sizeof(sensor_descriptor_state_full_t);
+    bool only_prop_ids = false;
+
+    // Check value of 2nd uint16_t if statement is true
+    // NOTE: This check fail if in the rare occasion that
+    //       the second sensor prop id is equal to the
+    //       positive tolerance of the one sensor.
+    if (buflen == sz_descriptor_full  &&
+        (buflen == NO_SENSORS * sz_sensor_prop_id))
+    {
+        switch (payload[2])
+        {
+            case SENSOR_AIRFLOW_PROP_ID:
+            case SENSOR_BME_TEMP_PROP_ID:
+            case SENSOR_BME_HUMI_PROP_ID:
+            case SENSOR_BME_PRES_PROP_ID:
+            case SENSOR_BATTERY_PROP_ID:
+                only_prop_ids = true;
+                break;
+            
+            default:
+                break;
+        }
+    }
+
+    // Print depends on payload size
+    // NOTE: NO_SENSORS * sz_sensor_prop_id could be equal to
+    //       sz_descriptor_full. Therefore and extra check of
+    //       the second uint16_t value must be performed (see above).
+    if (buflen == sz_sensor_prop_id ||                                    // sensor prop id for one sensor
+        ((buflen == NO_SENSORS * sz_sensor_prop_id) && only_prop_ids))    // sensor prop id for all sensors
+    {
+        for (int i = 0; i < (buflen >> 1); i++) {
+            printk("Sensor property id [%d] = 0x%x\n", i, payload[i]);
+        }
+    }
+    else if (buflen == sz_descriptor_full ||                 // all descriptor members of one sensor
+             buflen == (NO_SENSORS * sz_descriptor_full))    // all descriptor members of all sensors
+    {
+        for (int i = 0; i < (buflen >> 1); i ++) {
+            printk("Property id[%d]        = 0x%x\n", i, payload[i]);
+            printk("Positive tolerance[%d] = %d\n", i, payload[i + 1]);
+            printk("Negative tolerance[%d] = %d\n", i, payload[i + 2]);
+            printk("Sampling function[%d]  = %d\n", i, payload[(i << 1) + 3]);
+            printk("Measurment period[%d]  = %d\n", i, payload[(i << 1) + 4]);
+            printk("Update interval[%d]    = %d\n", i, payload[(i << 1) + 5]);
+        }
+    }
     
-    // Optional -> not implemented -> IMPLEMENT (because _get_tx is implemented)
-    printk("Sensor Descriptor Status not implemented\n");
     return;
 }
 
@@ -184,6 +233,11 @@ int sensor_descriptor_get_tx(uint16_t sensor_property_id)
     {
         // Add property ID to message
         net_buf_simple_add_le16(msg, sensor_property_id);
+        printk("Message: 0x%x\n", sensor_property_id);
+    }
+    else
+    {
+        printk("Message does not contain a payload.\n");
     }
     
     printk("Publishing descriptor get message...\n");

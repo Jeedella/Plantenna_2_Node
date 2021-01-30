@@ -87,13 +87,13 @@ int sensor_data_get_tx(uint16_t property_id);
 
 // Opcode
 static const struct bt_mesh_model_op sensor_cli_op[] = {
-    {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS, sizeof(sensor_descriptor_state_short_t), sensor_descriptor_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_DATA_STATUS,       0,                                       sensor_data_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_COLUMN_STATUS,     sizeof(sensor_column_state_short_t),     sensor_column_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SERIES_STATUS,     sizeof(sensor_series_state_short_t),     sensor_series_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_CADENCE_STATUS,    sizeof(sensor_cadence_state_short_t),    sensor_cadence_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_STATUS,   sizeof(sensor_settings_state_short_t),   sensor_settings_status_rx},
-    {BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS,    sizeof(sensor_setting_state_short_t),    sensor_setting_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS, 0, sensor_descriptor_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_DATA_STATUS,       0, sensor_data_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_COLUMN_STATUS,     0, sensor_column_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SERIES_STATUS,     0, sensor_series_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_CADENCE_STATUS,    0, sensor_cadence_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTINGS_STATUS,   0, sensor_settings_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS,    0, sensor_setting_status_rx},
     BT_MESH_MODEL_OP_END,
 };
 

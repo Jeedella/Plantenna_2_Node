@@ -31,7 +31,6 @@ uint16_t reply_addr;
 uint8_t reply_net_idx;
 uint8_t reply_app_idx;
 uint8_t reply_send_ttl;
-struct bt_mesh_model *reply_model;
 
 
 // -------------------------------------------------------------------------------------------------------
@@ -122,6 +121,8 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+    #else
+        fail += 0b1;
     #endif
     
     
@@ -142,6 +143,8 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         // BME pressure sensor //
         settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id     = SENSOR_BME_PRES_PROP_ID;    // Property ID of the sensor (16 bits)
         //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+    #else
+        fail += 0b1 << 1;
     #endif
     
     
@@ -170,6 +173,8 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
         //settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+    #else
+        fail += 0b1 << 2;
     #endif
     
     
@@ -206,9 +211,81 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+    #else
+        fail += 0b1 << 3;
     #endif
     
     return fail;
+}
+
+int get_idx_sensor_model_local_storage(uint16_t sensor_prop_id, int* sensor_idx_buff)
+{
+    switch (sensor_prop_id)
+    {
+        case SENSOR_AIRFLOW_PROP_ID:
+            *sensor_idx_buff = SENSOR_AIRFLOW_IDX;
+            break;
+        
+        case SENSOR_BME_TEMP_PROP_ID:
+            *sensor_idx_buff = SENSOR_BME_TEMP_IDX;
+            break;
+        
+        case SENSOR_BME_HUMI_PROP_ID:
+            *sensor_idx_buff = SENSOR_BME_HUMI_IDX;
+            break;
+        
+        case SENSOR_BME_PRES_PROP_ID:
+            *sensor_idx_buff = SENSOR_BME_PRES_IDX;
+            break;
+        
+        case SENSOR_BATTERY_PROP_ID:
+            *sensor_idx_buff = SENSOR_BATTERY_IDX;
+            break;
+        
+        case SENSOR_ALL_PROP_ID:
+            *sensor_idx_buff = SENSOR_ALL_IDX;
+            break;
+
+            default:
+                return -1;
+    }
+
+    return 0;
+}
+
+int get_prop_id_sensor_model_local_storage( int sensor_idx, uint16_t* sensor_prop_id_buff)
+{
+    switch (sensor_idx)
+    {
+        case SENSOR_AIRFLOW_IDX:
+            *sensor_prop_id_buff = SENSOR_AIRFLOW_PROP_ID;
+            break;
+        
+        case SENSOR_BME_TEMP_IDX:
+            *sensor_prop_id_buff = SENSOR_BME_TEMP_PROP_ID;
+            break;
+        
+        case SENSOR_BME_HUMI_IDX:
+            *sensor_prop_id_buff = SENSOR_BME_HUMI_PROP_ID;
+            break;
+        
+        case  SENSOR_BME_PRES_IDX:
+            *sensor_prop_id_buff =SENSOR_BME_PRES_PROP_ID;
+            break;
+        
+        case SENSOR_BATTERY_IDX:
+            *sensor_prop_id_buff = SENSOR_BATTERY_PROP_ID;
+            break;
+        
+        case  SENSOR_ALL_IDX:
+            *sensor_prop_id_buff =SENSOR_ALL_PROP_ID;
+            break;
+
+            default:
+                return -1;
+    }
+
+    return 0;
 }
 
 int get_data_sensor_model_local_storage(int sensor_idx, int state, sensor_model_local* sensor_data)
@@ -324,7 +401,6 @@ void sensor_setting_set_unack_rx(struct bt_mesh_model *model,
 // Sensor Server Model
 // --------------------------
 // Forward declarations of tx functions
-int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id);
 int sensor_column_status_tx();
 int sensor_series_status_tx();
 
@@ -357,8 +433,6 @@ void sensor_descriptor_get_rx(struct bt_mesh_model *model,
     // Default value of sensor_property_id is -1 (-> send for all sensors)
     int sensor_property_id = -1;
     
-    bool only_sensor_property_id = true;
-    
     if (buf->len)    // Property ID field present -> send for specified sensor
     {
 		// Pull prop_id from buf
@@ -372,15 +446,18 @@ void sensor_descriptor_get_rx(struct bt_mesh_model *model,
     
         // Print prop_id
         printk("Received prop id = 0x%x\n", sensor_property_id);
-        
-        if (buf->len > 2)    // More than sensor property id was send
-        {
-            only_sensor_property_id = false;
-        }
+    }
+    else
+    {
+        sensor_property_id = SENSOR_ALL_PROP_ID;
+        printk("Received no property id, so reply with all sensors\n");
     }
     
-    // Send sensor_descriptor_status_tx messages
+    // Set msg as publish, only prop id
     bool publish = true;
+    bool only_sensor_property_id = false;
+
+    // Send sensor_descriptor_status_tx messages
     int err = sensor_descriptor_status_tx(publish, sensor_property_id, only_sensor_property_id);
     
     if (err)
@@ -475,8 +552,8 @@ int sensor_setting_status_tx()
 // -------------------------------------------------------------------------------------------------------
 // Sensor Server - TX message producer functions
 // -----------------------------------------------------------
-// Descriptor
-int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id)
+// Descriptor (works only for publish = true and only_sensor_property_id = true. All other options fail during publish/send, due to some size error)
+int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool only_sensor_property_id)
 {
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
     
@@ -485,59 +562,76 @@ int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_
         printk("No publish address associated with the sensor server model - add one with a configuration app like nRF Mesh\n");
         return bt_mesh_PUBLISH_NOT_SET;
     }
+
+    // Check if sensor property id is valid
+    int sensor_idx;
+    int error = get_idx_sensor_model_local_storage(sensor_property_id, &sensor_idx);
+    if (error == -1)
+    {
+        printk("Unkown sensor property id 0x%x. Abbort descrptor status tx!\n", sensor_property_id);
+        return -1;
+    }
     
     // Init msg
     struct net_buf_simple *msg = model->pub->msg;
     bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_STATUS);
-    
+    int payload_length;
+
+    // Local variables
+    int state = STATE_DESCRIPTOR;
+    sensor_model_local descriptor[NO_SENSORS];
+
     // Collect data member(s) and save in msg
-    if (!only_sensor_property_id)    // Collect all data members
+    if (!only_sensor_property_id)    // Collect all descriptor members
     {
-        // Local variables
-        int state = STATE_DESCRIPTOR;
-        sensor_model_local descriptor[NO_SENSORS];
-        int sensor_idx;
+        printk("Collect all descriptor members\n");
         
-        switch (sensor_property_id)
-        {
-            case SENSOR_AIRFLOW_PROP_ID:
-                sensor_idx = SENSOR_AIRFLOW_IDX;
-                break;
-            case SENSOR_BME_TEMP_PROP_ID:
-                printk("HERE");
-                sensor_idx = SENSOR_BME_TEMP_IDX;
-                break;
-            case SENSOR_BME_HUMI_PROP_ID:
-                sensor_idx = SENSOR_BME_HUMI_IDX;
-                break;
-            case SENSOR_BME_PRES_PROP_ID:
-                sensor_idx = SENSOR_BME_PRES_IDX;
-                break;
-            case -1:    // Send for all sensors
-                sensor_idx = -1;
-                break;;
-            default:    // Unknown sensor_property_id -> Omit this request
-                return -1;
-        }
-        
-        if (sensor_idx)    // Save data for selected sensor_index
+        if (sensor_idx != SENSOR_ALL_IDX)    // Save data for selected sensor_index
         {
             get_data_sensor_model_local_storage(sensor_idx, state, descriptor);
             net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
+            payload_length = sensor_descriptor_heap_size;
+            printk("All descriptor members for one sensors (prop_id = 0x%x) will be returned\n", sensor_property_id);
         }
         else    // Save data for all sensor_indexes
         {
-            for (int i = sensor_idx; i < NO_SENSORS; i++) {
-                get_data_sensor_model_local_storage(i, state, descriptor);
+            for (int idx = 0; idx < NO_SENSORS; idx++) {
+                get_data_sensor_model_local_storage(idx, state, descriptor);
                 net_buf_simple_add_mem(msg, descriptor, sensor_descriptor_heap_size);
             }
+            payload_length = sensor_descriptor_heap_size * NO_SENSORS;
+            printk("All descriptor members for all sensors will be returned\n");
         }
     }
-    else    // Collect only sensor property id
+    else    // Collect only sensor property id(s)
     {
-        
+        printk("Collect only sensor property id(s)\n");
+        payload_length = 0;
+
+        if (sensor_property_id == SENSOR_ALL_PROP_ID)    // Overwrite message with all sensor property ids
+        {
+            for (int idx = 0; idx < NO_SENSORS; idx++) {
+                uint16_t prop_id;
+                get_prop_id_sensor_model_local_storage(idx, &prop_id);
+                net_buf_simple_add_le16(msg, prop_id);
+
+                // Increment payload lenght
+                payload_length += sizeof(sensor_property_id);
+            }
+
+            printk("Only property ids for all sensors will be returned\n");
+        }
+        else
+        {
+            payload_length = 2;
+            net_buf_simple_add_le16(msg, sensor_property_id);
+            printk("Property id for one sensor (prop id = 0x%x) will be returned\n", sensor_property_id);
+        }
     }
     
+    // Print reply msg and payload lenght
+    printk("Reply message has length: %d\n", payload_length);
+
     if (publish)    // Publish msg
     {
         printk("Publishing descriptor get message...\n");
@@ -554,6 +648,7 @@ int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_
             .net_idx  = reply_net_idx,
             .app_idx  = reply_app_idx,
             .addr     = reply_addr,
+            .send_rel = true,
             .send_ttl = reply_send_ttl,
             };
         
@@ -573,12 +668,12 @@ int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_
 // Data
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
-    const static uint16_t id_lookup[no_sensors] = {
+    const static uint16_t id_lookup[NO_SENSORS] = {
         0,
-        sensor_bme_tmp_property_id,
-        sensor_bme_humid_property_id,
-        sensor_bme_pres_property_id,
-        sensor_battery_property_id
+        SENSOR_BME_TEMP_PROP_ID,
+        SENSOR_BME_HUMI_PROP_ID,
+        SENSOR_BME_PRES_PROP_ID,
+        SENSOR_BATTERY_PROP_ID
     };
     const static uint16_t add_MIPDA = 0x2000;
 
@@ -591,31 +686,31 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 
     int payload_length;
     if(prop_id) payload_length = 4;    // Length marshall type A + sensor_raw (1 sensor)
-    else payload_length = no_sensors << 2;    // No_sensors * length 1 sensor(4)
+    else payload_length = NO_SENSORS << 2;    // No_sensors * length 1 sensor(4)
     uint16_t payload[payload_length >> 1];    // Uint16_t so divide by 2
-    printk("Reply message has length is: %d\n", payload_length);
+    printk("Reply message length is: %d\n", payload_length);
 
     for(int k = 0; k < (payload_length >> 2); k++) {
         switch(id_lookup[k] ^ prop_id) {
             case 0:
-            case sensor_airflow_property_id:
-                payload[k << 1] = sensor_airflow_property_id ^ add_MIPDA;
+            case SENSOR_AIRFLOW_PROP_ID:
+                payload[k << 1] = SENSOR_AIRFLOW_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.airf;
                 break;
-            case sensor_bme_tmp_property_id:
-                payload[k << 1] = sensor_bme_tmp_property_id ^ add_MIPDA;
+            case SENSOR_BME_TEMP_PROP_ID:
+                payload[k << 1] = SENSOR_BME_TEMP_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.temp;
                 break;
-            case sensor_bme_humid_property_id:
-                payload[k << 1] = sensor_bme_humid_property_id ^ add_MIPDA;
+            case SENSOR_BME_HUMI_PROP_ID:
+                payload[k << 1] = SENSOR_BME_HUMI_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.humi;
                 break;
-            case sensor_bme_pres_property_id:
-                payload[k << 1] = sensor_bme_pres_property_id ^ add_MIPDA;
+            case SENSOR_BME_PRES_PROP_ID:
+                payload[k << 1] = SENSOR_BME_PRES_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.pres;
                 break;
-            case sensor_battery_property_id:
-                payload[k << 1] = sensor_battery_property_id ^ add_MIPDA;
+            case SENSOR_BATTERY_PROP_ID:
+                payload[k << 1] = SENSOR_BATTERY_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.batt;
                 break;
             default:

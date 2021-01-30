@@ -49,7 +49,7 @@ void updateHandler()
 				printk("Status msg sending done\n");
 			#else
 				printk("Get msg sending...\n");
-				//sensor_descriptor_get_tx(true, true);
+				//sensor_descriptor_get_tx(0);
                 sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
 			#endif

@@ -58,6 +58,26 @@ typedef enum {cadence, settings, setting, descriptor } sensor_storage_names;
 */
 int init_sensor_model_local_storage();
 
+// Get the sensor storage index from a sensor property id
+/*
+    sensor_prop_id  = index value of the requested sensor
+	sensor_idx_buff = buffer to which the sensor storage index is copied to
+	
+	returns  0 when no errors have occured
+	returns -1 otherwise
+*/
+int get_idx_sensor_model_local_storage(uint16_t sensor_prop_id, int* sensor_idx_buff);
+
+// Get the sensor property id from a sensor storage index
+/*
+    sensor_idx           = buffer to which the sensor storage index is copied to
+	sensor_prop_id_buff  = index value of the requested sensor
+	
+	returns  0 when no errors have occured
+	returns -1 otherwise
+*/
+int get_prop_id_sensor_model_local_storage(int sensor_idx, uint16_t* sensor_prop_id_buff);
+
 // Get a sensor model local storage entry at a specific storage index
 /*
     sensor_idx  = index value of the requested sensor
@@ -148,7 +168,7 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 // Cadence, Settings and Setting in Sensor Setup Server Model
 
 // TX messasges (sensor server)
-int sensor_descriptor_status_tx(bool publish, int sensor_property_id, bool only_sensor_property_id);
+int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool only_sensor_property_id);
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 
 // Opcode
