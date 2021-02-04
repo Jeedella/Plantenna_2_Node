@@ -138,6 +138,7 @@ int sensor_read(airflow_local* airflowMem)
 			temp.val1, temp.val2, pres.val1, pres.val2,	humi.val1, humi.val2);
 	}
     else {
+        airflowMem->temp = (uint16_t)get_local_storage_index();
         return 1;
     }
 

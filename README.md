@@ -29,9 +29,10 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
     > echo 'export ZEPHYR_BASE=~/zephyrproject/zephyr' >> ~/.bashrc
     > ```
 
-3. If everything up to this point has been setup correctly, the program can be build and uploaded just like the zephyr samples:
+3. If everything up to this point has been setup correctly, the program can be build and uploaded just like the zephyr samples. Since three bluetooth variants of the application exists (ble, mesh_server and mesh_client), the bluetooth type has to be specified first.
 
     ```text
+    export SPMS_BT=<bluetooth_type>
     west build -p auto -b nrf52dk_nrf52832 Plantenna_2_Node/
     west flash
     ```

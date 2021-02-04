@@ -23,7 +23,6 @@
     0           manufacturer specific size      0x1D (default)
     1           manufacturer specific AD type   0xFF (default)
     2-3         company ID                      0xFF (default)
-
     4-5         temperature         in °C       x100
     6-7         humidity            in %RH      x100
     8-9         pressure            in hPa      -
@@ -49,7 +48,6 @@ int ble_adv_stop_airflow();
 /*
     airFlowmem  pointer to airflow_local object
     status      charge state
-
     returns 0 when no errors have occurred
 */
 int ble_update_airflow(airflow_local* airflowMem, uint8_t status);

@@ -21,22 +21,6 @@
 #include <bluetooth/uuid.h>
 #include <bluetooth/gatt.h>
 
-// Local data frame definition
-/*
-    time        timestamp           in epoch    -
-    temp        temperature         in °C       x100
-    humi        humidity            in %RH      x100
-    pres        pressure            in hPa      -
-    batt        battery voltage     in mV       /20
-    airf        airflow             in mm/s     -           
-*/
-typedef struct {
-    uint32_t    time;
-    int16_t     temp;
-    uint16_t    humi;
-    uint16_t    pres;
-    uint8_t     batt;
-    uint16_t    airf;
-} airflow_local;
+#include "spms_local_storage.h"
 
 #endif
