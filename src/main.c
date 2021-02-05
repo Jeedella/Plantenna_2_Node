@@ -35,6 +35,8 @@ void updateHandler()
 
     sensor_data.time = timeStamp;
     sensor_read(&sensor_data);
+    //ccs811_main(); 
+    //do_fetch_ccs811(dev, &localStorage[storageIndex]);
 
     if(!add_sensor_series(sensor_data)) {
         #if defined(__SPMS_BT)

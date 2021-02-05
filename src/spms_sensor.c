@@ -1,8 +1,6 @@
 // Includes
 #include "spms_libs.h"
 #include "spms_sensor.h"
-#include <stdio.h>
-#include <math.h>
 
 
 // Compiler macros
@@ -15,6 +13,8 @@
 #define ADC_1ST_CHANNEL_INPUT NRF_SAADC_INPUT_AIN1
 #define ADC_2ND_CHANNEL_ID 2
 #define ADC_2ND_CHANNEL_INPUT NRF_SAADC_INPUT_AIN2
+#define ADC_3ND_CHANNEL_ID 3
+#define ADC_3ND_CHANNEL_INPUT NRF_SAADC_INPUT_AIN3
 
 #define BME280_NAME DT_INST(0, bosch_bme280)
 #if DT_NODE_HAS_STATUS(BME280_NAME, okay)
@@ -45,6 +45,14 @@ static const struct adc_channel_cfg m_2nd_channel_cfg = {
 	.input_positive   = ADC_2ND_CHANNEL_INPUT,
 };
 
+static const struct adc_channel_cfg m_3nd_channel_cfg = {
+	.gain             = ADC_GAIN,
+	.reference        = ADC_REFERENCE,
+	.acquisition_time = ADC_ACQUISITION_TIME,
+	.channel_id       = ADC_3ND_CHANNEL_ID,
+	.input_positive   = ADC_3ND_CHANNEL_INPUT,
+};
+
 // Initialize the sensors
 int sensor_init()
 {
@@ -62,6 +70,9 @@ int sensor_init()
        else status = status ^ 0x1;
     
        if (!adc_channel_setup(devADC, &m_2nd_channel_cfg)) printk("[Log] ADC channel 2 configured\n");
+       else status = status ^ 0x1;
+
+       if (!adc_channel_setup(devADC, &m_3nd_channel_cfg)) printk("[Log] ADC channel 3 configured\n");
        else status = status ^ 0x1;
     }
 
@@ -81,6 +92,7 @@ int sensor_read(airflow_local* airflowMem)
 {
     int16_t tmp_adc1;               // buffer to store adc channel 1 data
     int16_t tmp_adc2;               // buffer to store adc channel 2 data
+    int16_t tmp_adc3;               // buffer to store adc channel 3 data    
     double Vout; 
     double offset = 1.210;          // ref voltage must be 3.3V
     struct sensor_value temp, humi, pres;
@@ -102,9 +114,19 @@ int sensor_read(airflow_local* airflowMem)
 		.oversampling = 0,	// don't oversample
 		.calibrate = 0		
 	};    
+
+    struct adc_sequence sequence3 = {
+		.channels    = BIT(ADC_3ND_CHANNEL_ID),
+		.buffer      = &tmp_adc3,
+		.buffer_size = sizeof(tmp_adc3),
+		.resolution  = ADC_RESOLUTION,
+		.oversampling = 0,	// don't oversample
+		.calibrate = 0		
+	};        
     
     adc_read(devADC, &sequence1);
     adc_read(devADC, &sequence2);
+    adc_read(devADC, &sequence3);
 
     // calculate voltage airflow sensor
     Vout = 3.3 * tmp_adc1 * offset / 1023; 
@@ -117,6 +139,7 @@ int sensor_read(airflow_local* airflowMem)
 
     printk("[Sensor] adc value :%d\n", tmp_adc1);
     printk("[Sensor] adc value :%d\n", tmp_adc2);   
+    printk("[Sensor] adc value :%d\n", tmp_adc3);   
     printk("[Sensor] airflow speed :%d\n", airflowMem->airf);
 
     if (devBME != NULL) {
@@ -138,7 +161,6 @@ int sensor_read(airflow_local* airflowMem)
 			temp.val1, temp.val2, pres.val1, pres.val2,	humi.val1, humi.val2);
 	}
     else {
-        airflowMem->temp = (uint16_t)get_local_storage_index();
         return 1;
     }
 
