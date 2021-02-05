@@ -43,6 +43,24 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 
     * It is also possible to upload the program manually by drag and dropping the generated .hex file located in the `build/zephyr/` folder.
     * When using [WSL](https://ubuntu.com/wsl), Ubuntu files can be found in the folder `\\wsl$\Ubuntu`.
+    * When having issues with building, try removing the build folder first before taking any other measures using:
+        ````text
+        rm -r build/
+        ````
+
+## Bluetooth Mesh sensor model
+The SPMS node contains code for the sensor client model and sensor server model. The sensor setup server model has not yet been implemented. The status regarding the sensor model is shown below:
+
+| Message | Opcode | Send by | Status |
+| :-----: | :----: | :-----: | :----: |
+| Sensor Descriptor Get | 0x82 0x30 | Client | |
+| Sensor Descriptor Status | 0x51 | Server | |
+| Sensor Get | 0x82 0x31 | Client | Implemented, both with and without property ID present |
+| Sensor Status | 0x52 | Server | Implemented, both one specific sensor or all sensors |
+| Sensor Column Get | 0x82 0x32 | Client | Not yet implemented |
+| Sensor Column Status | 0x53 | Server | Not yet implemented |
+| Sensor Series Get | 0x82 0x33 | Client | Not yet implemented |
+| Sensor Series Status | 0x54 | Server | Not yet implemented |
 
 ## Bluetooth low energy profile
 
@@ -76,7 +94,7 @@ The SPMS node its Bluetooth Low Energy (BLE) profile is based on the portable pr
 
 The brief steps that need to be taken in order to setup an Ubuntu VM for setting up the zephyr build environment and programming the nRF can be found below. It has been tested to work with Virtual box version 6.1.18, Ubuntu server version 20.04.1 and the nRF command-line-tools version 10.12.1.
 1. Install [Virtual box](https://www.virtualbox.org/) and download the [Ubuntu server ISO](https://ubuntu.com/download/server).
-2. Create a new VM having with disk size of atleast 20GB.
+2. Create a new VM having with disk size of around 20GB.
 3. Change the network adaptor settings of the VM to bridged to allow for ssh access later on.
 4. Insert the Ubuntu ISO in the VM's optical drive and start the VM.
 5. Follow the Ubuntu installation leaving all options on default. When asked for installing openSSH, check the box to install it.
