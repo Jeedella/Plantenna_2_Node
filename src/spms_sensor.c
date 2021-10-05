@@ -132,7 +132,7 @@ int sensor_read(airflow_local* airflowMem)
     Vout = 3.3 * tmp_adc1 * offset / 1023; 
     
     // Debug
-    printf("[Sensor] Vout %lf\n", Vout);
+    printk("[Sensor] Vout %lf\n", Vout);
 
     // calculate speed from voltage
     airflowMem->airf = pow((((Vout - 1.30)/(3.038517*pow(25,0.115157)))/0.087288),3.009364)*0.44704;

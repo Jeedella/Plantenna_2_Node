@@ -91,15 +91,15 @@ static const struct bt_mesh_prov prov = {
 // -------------------------------------------------------------------------------------------------------
 // Configuration Server
 // --------------------
-static struct bt_mesh_cfg_srv cfg_srv = {
-    .relay = BT_MESH_RELAY_DISABLED,
-    .beacon = BT_MESH_BEACON_DISABLED,
-    .frnd = BT_MESH_FRIEND_NOT_SUPPORTED,
-    .gatt_proxy = BT_MESH_GATT_PROXY_ENABLED,
-    .default_ttl = 7,
-    /* 3 transmissions with 20ms interval */
-    .net_transmit = BT_MESH_TRANSMIT(2, 20),
-};
+// static struct bt_mesh_cfg cfg_srv = {
+//     .relay = BT_MESH_RELAY_DISABLED,
+//     .beacon = BT_MESH_BEACON_DISABLED,
+//     .frnd = BT_MESH_FRIEND_NOT_SUPPORTED,
+//     .gatt_proxy = BT_MESH_GATT_PROXY_ENABLED,
+//     .default_ttl = 7,
+//     /* 3 transmissions with 20ms interval */
+//     .net_transmit = BT_MESH_TRANSMIT(2, 20),
+// };
 
 // -------------------------------------------------------------------------------------------------------
 // Health Server
@@ -114,7 +114,8 @@ static struct bt_mesh_health_srv health_srv = {
 // -----------
 // elements contain models (1 or more)
 struct bt_mesh_model sig_models[] = {
-    BT_MESH_MODEL_CFG_SRV(&cfg_srv),
+    // BT_MESH_MODEL_CFG_SRV(&cfg_srv),
+    BT_MESH_MODEL_CFG_SRV,
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
     #if defined(__SPMS_BT) && __SPMS_BT == 1
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
