@@ -1,5 +1,6 @@
 /*
-* Plantenna 2 node - bt mesh (Setup) Server test file
+* Plantenna 2 node - bt mesh (Setup) node
+ test file
 * File name:    main.c
 * Author:       Frank Arts
 * Date:         20-01-2021
@@ -36,11 +37,11 @@ void updateHandler()
     printk("[Log] Current storage index is %d\n", get_local_storage_index());
     #if defined(__SPMS_BT)
         #if __SPMS_BT==1
-            printk("<dbg> I'm server\n");
+            printk("<dbg> I'm a node\n");
             sensor_data.time = timeStamp;
             sensor_read(&sensor_data);
         #elif __SPMS_BT==2
-            printk("<dbp> I'm a client\n");
+            printk("<dbg> I'm a server\n");
         #endif
     #endif
     
@@ -124,13 +125,16 @@ int init_SPMS()
     else if (status & WARNING) {printk("[Warning] Initialization passed with warnings\n");}
     else printk("[Pass] Initialization passed without warnings\n");
 
+    // Peripherals
+    perInit();
+
     return 0;
 }
 
 /* main */
 void main() {
     printk("Plantenna 2.0 node - (test_build)\n");
-    perDbgInit();
+
     if(!init_SPMS()) {
         printk("[Starting] Application\n");
         updateHandler();
