@@ -32,9 +32,16 @@ void updateHandler()
 
     printk("[Time] Timer expired at %d\n", timeStamp);
     printk("[Log] Current storage index is %d\n", get_local_storage_index());
-
-    sensor_data.time = timeStamp;
-    sensor_read(&sensor_data);
+    #if defined(__SPMS_BT)
+        #if __SPMS_BT==1
+            printk("<dbg> I'm server\n");
+            sensor_data.time = timeStamp;
+            sensor_read(&sensor_data);
+        #elif __SPMS_BT==2
+            printk("<dbp> I'm a client\n");
+        #endif
+    #endif
+    
     //ccs811_main(); 
     //do_fetch_ccs811(dev, &localStorage[storageIndex]);
 
