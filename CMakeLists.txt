@@ -12,22 +12,22 @@ if(${SPMS_BT} MATCHES ble)
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/ble/spms_ble.c)
     message(STATUS "Building SPMS node as ble")
-elseif(${SPMS_BT}  MATCHES mesh_server)
+elseif(${SPMS_BT}  MATCHES mesh_node)
     add_definitions(-D__SPMS_BT=1)
     file(GLOB app_sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh/mesh_base_model.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh/mesh_sensor_setup_server.c)
-    message(STATUS "Building SPMS node as mesh_server")
-elseif(${SPMS_BT} MATCHES mesh_client)
+    message(STATUS "Building SPMS as Node")
+elseif(${SPMS_BT} MATCHES mesh_server)
     add_definitions(-D__SPMS_BT=2)
     file(GLOB app_sources
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.c 
         ${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh/mesh_base_model.c
         ${CMAKE_CURRENT_SOURCE_DIR}/src/mesh/mesh_sensor_client.c)
-    message(STATUS "Building SPMS node as mesh_client")
+    message(STATUS "Building SPMS as Server")
 else() 
     message(FATAL_ERROR "SPMS_BT environment variable not correctly defined\nValid options are ble, mesh_server and mesh_client")
 endif()
