@@ -51,6 +51,7 @@ void perInit()
 			printk("Set up LED at %s pin %d\n", led.port->name, led.pin);
 		}
 	}
+	gpio_pin_set_dt(&led, 0);
 }
 
 
@@ -66,7 +67,7 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
 				status.short_pkt.sensor_property_id = 0xFF;
 				
 				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, 0xFF, true);
+				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
 				printk("Status msg sending done\n");
 			#else
 				gpio_pin_set_dt(&led, 1);
