@@ -10,9 +10,12 @@
 */
 
 // SPMS
-#include "spms_libs.h"
+#include "spms_libs.h" 
 #include "spms_sensor.h"
 #include "mesh_sensor_common.h"
+
+
+
 
 #if defined(__SPMS_BT) && __SPMS_BT != 0
     // BT MESH base model (config + health) + other added models
@@ -20,6 +23,11 @@
 #else
     #include "spms_ble.h"
 #endif
+void button_pressed(const struct device *dev, struct gpio_callback *cb,
+		    uint32_t pins)
+{
+	printk("Button pressed at %" PRIu32 "\n", k_cycle_get_32());
+}
 
 // globals
 static struct k_timer updateTimer;
@@ -54,7 +62,7 @@ void updateHandler()
 				status.short_pkt.sensor_property_id = 0xFF;
 				
 				printk("Status msg sending...\n");
-				//sensor_descriptor_status_tx(true, status, true);
+				sensor_descriptor_status_tx(true, status, true);
 				printk("Status msg sending done\n");
 			#else
 				printk("Get msg sending...\n");
