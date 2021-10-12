@@ -8,11 +8,6 @@
 
 void perInit()
 {
-
-}
-
-void perDbgInit()
-{
 	int ret;
 
 	if (!device_is_ready(button.port)) {
