@@ -59,7 +59,7 @@ void updateHandler()
 			#else
 				printk("Get msg sending...\n");
 				sensor_descriptor_get_tx(SENSOR_AIRFLOW_PROP_ID);
-                //sensor_data_get_tx(0);
+                sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
 			#endif
         #endif
