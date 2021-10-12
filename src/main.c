@@ -14,8 +14,8 @@
 #include "spms_sensor.h"
 #include "mesh_sensor_common.h"
 
-
-
+//Peripheral
+#include "peripherals.h"
 
 #if defined(__SPMS_BT) && __SPMS_BT != 0
     // BT MESH base model (config + health) + other added models
@@ -56,7 +56,7 @@ void updateHandler()
 				status.short_pkt.sensor_property_id = 0xFF;
 				
 				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, status, true);
+				//sensor_descriptor_status_tx(true, status, true);
 				printk("Status msg sending done\n");
 			#else
 				printk("Get msg sending...\n");
@@ -130,6 +130,7 @@ int init_SPMS()
 /* main */
 void main() {
     printk("Plantenna 2.0 node - (test_build)\n");
+    perDbgInit();
     if(!init_SPMS()) {
         printk("[Starting] Application\n");
         updateHandler();

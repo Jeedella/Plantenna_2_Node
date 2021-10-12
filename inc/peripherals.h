@@ -25,5 +25,13 @@ static struct gpio_callback button_cb_data;
  */
 static struct gpio_dt_spec led = GPIO_DT_SPEC_GET_OR(DT_ALIAS(led0), gpios,
 						     {0});
+	
+	
+	void perInit();
+	void perDbgInit();
+	void button_pressed(const struct device *dev, struct gpio_callback *cb, uint32_t pins);
 
 #endif
+
+
+
