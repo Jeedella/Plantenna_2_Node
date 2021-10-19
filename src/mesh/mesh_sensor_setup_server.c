@@ -121,6 +121,15 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+         // Test sensor //
+        cadenceLocalStorage[SENSOR_TEST_IDX].sensor_property             = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].fast_cadence_period_divisor = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_type         = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_delta_down   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_delta_up     = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
     #else
         fail += 0b1;
     #endif
@@ -142,6 +151,10 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         
         // BME pressure sensor //
         settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id     = SENSOR_BME_PRES_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+        
+        // Test sensor //
+        settingsLocalStorage[SENSOR_TEST_IDX].sensor_property_id     = SENSOR_TEST_PROP_ID;    // Property ID of the sensor (16 bits)
         //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
     #else
         fail += 0b1 << 1;
@@ -173,6 +186,12 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
         //settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+        
+        // Test sensor //
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_property_id         = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
     #else
         fail += 0b1 << 2;
     #endif
@@ -211,6 +230,14 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
+
+        // Test sensor //
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_property_id        = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_positive_tolerance = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_negative_tolerance = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
     #else
         fail += 0b1 << 3;
     #endif
@@ -241,7 +268,9 @@ int get_idx_sensor_model_local_storage(uint16_t sensor_prop_id, int* sensor_idx_
         case SENSOR_BATTERY_PROP_ID:
             *sensor_idx_buff = SENSOR_BATTERY_IDX;
             break;
-        
+        case SENSOR_TEST_PROP_ID:
+            *sensor_idx_buff = SENSOR_TEST_IDX;
+            break;
         case SENSOR_ALL_PROP_ID:
             *sensor_idx_buff = SENSOR_ALL_IDX;
             break;
@@ -275,6 +304,9 @@ int get_prop_id_sensor_model_local_storage( int sensor_idx, uint16_t* sensor_pro
         
         case SENSOR_BATTERY_IDX:
             *sensor_prop_id_buff = SENSOR_BATTERY_PROP_ID;
+            break;
+        case SENSOR_TEST_IDX:
+            *sensor_prop_id_buff = SENSOR_TEST_PROP_ID;
             break;
         
         case  SENSOR_ALL_IDX:

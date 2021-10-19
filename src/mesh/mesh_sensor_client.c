@@ -106,6 +106,7 @@ void sensor_descriptor_status_rx(struct bt_mesh_model *model,
             case SENSOR_BME_HUMI_PROP_ID:
             case SENSOR_BME_PRES_PROP_ID:
             case SENSOR_BATTERY_PROP_ID:
+            case SENSOR_TEST_PROP_ID:
                 only_prop_ids = true;
                 break;
             

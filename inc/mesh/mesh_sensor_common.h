@@ -354,6 +354,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define SENSOR_BME_HUMI_IDX  2    // BME sensor - humidity
 #define SENSOR_BME_PRES_IDX  3    // BME sensor - pressure
 #define SENSOR_BATTERY_IDX   4    // BME sensor - pressure
+#define SENSOR_TEST_IDX      5    // Test sensor
 
 // Sensor property IDs (see https://specificationrefs.bluetooth.com/assigned-values/Appearance%20Values.pdf)
 #define SENSOR_ALL_PROP_ID      0xFFFF // Used to specify that all prop ids must be used (do NOT use for messages, only for examening a payload)
@@ -362,5 +363,6 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define SENSOR_BME_HUMI_PROP_ID 0x544 // Id of humidity sensor
 #define SENSOR_BME_PRES_PROP_ID 0x553 // Id of unused sensor
 #define SENSOR_BATTERY_PROP_ID  0x554 // Id of unused sensor
+#define SENSOR_TEST_PROP_ID     0x541 // Id of test sensor
 
 #endif /* __SENSOR_COMMON_H */
