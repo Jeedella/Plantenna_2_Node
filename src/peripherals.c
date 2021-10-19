@@ -67,14 +67,16 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
 				status.short_pkt.sensor_property_id = 0xFF;
 				
 				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, SENSOR_TEST_PROP_ID, true);
+				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
 				printk("Status msg sending done\n");
+				gpio_pin_set_dt(&led, 0);
 			#else				//Server
 				gpio_pin_set_dt(&led, 1);
 				printk("Get msg sending...\n");
-				sensor_descriptor_get_tx(SENSOR_AIRFLOW_PROP_ID);
+				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
                 sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
+				gpio_pin_set_dt(&led, 0);
 			#endif
         #endif
 }

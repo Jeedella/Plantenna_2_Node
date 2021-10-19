@@ -51,16 +51,16 @@ void updateHandler()
         #if defined(__SPMS_BT)
 			#if !__SPMS_BT
 				ble_update_airflow(&sensor_data, (uint8_t)sys_rand32_get());
-			#elif __SPMS_BT==1
-				sensor_descriptor_status_msg_pkt_t status;
-				status.short_pkt.sensor_property_id = 0xFF;
+			#elif __SPMS_BT==1      //Node
+				// sensor_descriptor_status_msg_pkt_t status;
+				// status.short_pkt.sensor_property_id = 0xFF;
 				
-				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
-				printk("Status msg sending done\n");
-			#else
+				// printk("Status msg sending...\n");
+				// sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
+				// printk("Status msg sending done\n");
+			#else                   //Server
 				printk("Get msg sending...\n");
-				sensor_descriptor_get_tx(SENSOR_AIRFLOW_PROP_ID);
+				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
                 sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
 			#endif

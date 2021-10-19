@@ -92,7 +92,7 @@ int get_data_sensor_model_local_storage(int sensor_idx, int state_idx, sensor_mo
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Setup Server Model
-// --------------------------
+// -------------------------
 // sensor server - handler functions for this model's RX messages
 // Cadence //
 void sensor_cadence_get_rx(struct bt_mesh_model *model,

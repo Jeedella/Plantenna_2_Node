@@ -345,7 +345,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 // Indexes and property IDs
 // --------------------------
 // Number of sensors and thus number of states
-#define NO_SENSORS 5
+#define NO_SENSORS 6
 
 // Indexes
 #define SENSOR_ALL_IDX     0xFFFF // All idx must be used (do NOT use for messages, only for examening a payload)
