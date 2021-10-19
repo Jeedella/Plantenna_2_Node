@@ -745,6 +745,10 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
                 payload[k << 1] = SENSOR_BATTERY_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.batt;
                 break;
+            case SENSOR_TEST_PROP_ID:
+                payload[k << 1] = SENSOR_TEST_PROP_ID ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.test;
+                break;
             default:
                 printk("Invalid property ID");
                 return bt_mesh_SEND_FAILED;

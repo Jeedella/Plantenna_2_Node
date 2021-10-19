@@ -61,15 +61,15 @@ void button_pressed(const struct device *dev, struct gpio_callback *cb,
 	 #if defined(__SPMS_BT)
 			#if !__SPMS_BT
 				printk("Bu to n\n");
-			#elif __SPMS_BT==1
+			#elif __SPMS_BT==1 //Node
 				gpio_pin_set_dt(&led, 1);
 				sensor_descriptor_status_msg_pkt_t status;
 				status.short_pkt.sensor_property_id = 0xFF;
 				
 				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
+				sensor_descriptor_status_tx(true, SENSOR_TEST_PROP_ID, true);
 				printk("Status msg sending done\n");
-			#else
+			#else				//Server
 				gpio_pin_set_dt(&led, 1);
 				printk("Get msg sending...\n");
 				sensor_descriptor_get_tx(SENSOR_AIRFLOW_PROP_ID);
