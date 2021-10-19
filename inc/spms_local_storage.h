@@ -19,6 +19,7 @@ typedef struct {
     uint16_t    pres;
     uint8_t     batt;
     uint16_t    airf;
+    uint16_t    test;
 } airflow_local;
 
 // Amount of airflow_local that are allocated  

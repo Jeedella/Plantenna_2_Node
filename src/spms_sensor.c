@@ -156,6 +156,7 @@ int sensor_read(airflow_local* airflowMem)
 		airflowMem->temp = (uint16_t) (((temp.val1 * 100) + (temp.val2 / 10000)));
 		airflowMem->humi = (uint16_t) (((humi.val1 * 100) + (humi.val2 / 10000)));
 		airflowMem->pres = (uint16_t) pres.val1;
+        airflowMem->test = (uint16_t) 0xFF00FF00;
 
 		printk("[Sensor] temp: %d.%06d; press: %d.%06d; humidity: %d.%06d\n",
 			temp.val1, temp.val2, pres.val1, pres.val2,	humi.val1, humi.val2);
