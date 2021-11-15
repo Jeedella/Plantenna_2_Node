@@ -96,6 +96,7 @@ int init_SPMS()
     #if defined(__SPMS_BT) && __SPMS_BT != 0
 	    #if __SPMS_BT == 1  //Node
             uint8_t rnd = sys_rand32_get()%128;
+            dev_uuid[0] = rnd;
             bt_ctlr_set_public_addr(dev_uuid);
             printk("[BT] My UUID is %d\n",rnd);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
