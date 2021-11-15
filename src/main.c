@@ -22,7 +22,7 @@
 #include "mesh_base_model.h"
 // globals
 static struct k_timer updateTimer;
-
+static const uint8_t device_id[5];
 // Timer expire handler
 void updateHandler()
 {
@@ -71,6 +71,8 @@ int init_SPMS()
     #define WARNING 0x1
     #define ERROR 0x2
 
+    // hwinfo_get_device_id(device_id,sizeof(device_id));
+
     const static char strInit [] = "Initializing";
     const static char strPass [] = "[Passed]";
     const static char strFail [] = "[Failed]";
@@ -94,8 +96,8 @@ int init_SPMS()
     #if defined(__SPMS_BT) && __SPMS_BT != 0
 	    #if __SPMS_BT == 1  //Node
             uint8_t rnd = sys_rand32_get()%128;
-            dev_uuid[0] = rnd;
             bt_ctlr_set_public_addr(dev_uuid);
+            printk("[BT] My UUID is %d\n",rnd);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
             else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
 		#endif      
