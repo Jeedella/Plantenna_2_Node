@@ -97,11 +97,12 @@ int init_SPMS()
     printk("[%s] bluetooth\n", strInit);
     #if defined(__SPMS_BT) && __SPMS_BT != 0
 	    #if __SPMS_BT == 1  //Node
-            bt_ctlr_set_public_addr(0x01);
+            dev_uuid[15] = rand()%255;
+            bt_ctlr_set_public_addr(dev_uuid);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
             else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
 		#endif      
-        bt_ctlr_set_public_addr(0xFF);        //Server
+        bt_ctlr_set_public_addr(dev_uuid);        //Server
         if(!bt_enable(spms_mesh_init)) printk("%s %s bluetooth\n", strPass, strInit);
     #else
         if(!bt_enable(NULL)) printk("%s %s bluetooth\n", strPass, strInit);
