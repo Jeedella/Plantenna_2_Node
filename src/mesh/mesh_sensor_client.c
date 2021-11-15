@@ -152,7 +152,8 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
 {
 	uint16_t buflen = buf->len;
     uint16_t* payload = net_buf_simple_pull_mem(buf, buflen);
-    printk("Received payload with size: %d\n", buflen);
+    printk("Sender:\t %d",ctx->addr HEX);
+    printk(" |Packet length: %d\n", buflen);
 
     for(int k = 0; k < (buflen >> 2); k++) {
         printk("Marshall[%d]: %d\n", k, payload[k << 1]);
