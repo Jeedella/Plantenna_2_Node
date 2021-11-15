@@ -374,4 +374,5 @@ static const char* sensor_names[]={
     "Battery",
     "Test"
 };
+
 #endif /* __SENSOR_COMMON_H */

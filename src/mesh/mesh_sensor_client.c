@@ -156,8 +156,9 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
     printk(" |Packet length: %d\n", buflen);
 
     for(int k = 0; k < (buflen >> 2); k++) {
-        printk("Marshall[%d]: %d\n", k, payload[k << 1]);
-        printk("Raw data[%d]: %d\n", k, payload[(k << 1) + 1]);
+
+        printk("[%d]: %s\n", k, sensor_names[GET_SENSOR(payload[k << 1])]);
+        printk("Data[%d]: %d\n", k, payload[(k << 1) + 1]);
     }
     return;
 }
