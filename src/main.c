@@ -18,12 +18,8 @@
 //Peripheral
 #include "peripherals.h"
 
-#if defined(__SPMS_BT) && __SPMS_BT != 0
-    // BT MESH base model (config + health) + other added models
-    #include "mesh_base_model.h"
-#else
-    #include "spms_ble.h"
-#endif
+// BT MESH base model (config + health) + other added models
+#include "mesh_base_model.h"
 // globals
 static struct k_timer updateTimer;
 
@@ -97,7 +93,7 @@ int init_SPMS()
     printk("[%s] bluetooth\n", strInit);
     #if defined(__SPMS_BT) && __SPMS_BT != 0
 	    #if __SPMS_BT == 1  //Node
-            dev_uuid[15] = rand()%255;
+            // dev_uuid[15] = rand()%255;
             bt_ctlr_set_public_addr(dev_uuid);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
             else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
