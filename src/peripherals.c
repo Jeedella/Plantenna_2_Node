@@ -22,7 +22,7 @@ static void button_pressed_fn(struct k_work *work)
 				status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
 				
 				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
+				sensor_data_status_tx(true, SENSOR_ALL_PROP_ID, true);
 				printk("Status msg sending done\n");
 				gpio_pin_set_dt(&led, 0);
 			#else				//Server
