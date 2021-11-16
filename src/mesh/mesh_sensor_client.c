@@ -150,15 +150,16 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
                             struct bt_mesh_msg_ctx *ctx,
                             struct net_buf_simple *buf)
 {
+    const static uint16_t remove_MIPDA = 0x2000;
 	uint16_t buflen = buf->len;
     uint16_t* payload = net_buf_simple_pull_mem(buf, buflen);
-    printk("Sender:\t %d",ctx->addr HEX);
+    printk("Sender: \t %x",ctx->addr);
     printk(" |Packet length: %d\n", buflen);
 
     for(int k = 0; k < (buflen >> 2); k++) {
 
-        printk("[%d]: %s\n", k, sensor_names[GET_SENSOR(payload[k << 1])]);
-        printk("Data[%d]: %d\n", k, payload[(k << 1) + 1]);
+        printk("Sensor\t[%d]:\t %s\n", k, sensor_names[GET_SENSOR(payload[k << 1])^remove_MIPDA]);
+        printk("Data\t[%d]:\t %d\n", k, payload[(k << 1) + 1]);
     }
     return;
 }
