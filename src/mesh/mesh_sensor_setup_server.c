@@ -579,6 +579,14 @@ int sensor_setting_status_tx()
     return 0;
 }
 
+
+void sensor_test_get_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf)
+{
+    printk("\nTest Received\n");
+}
+
 // Descriptor, Data, Column and Series in Sensor Server - TX message producer functions
 
 // -------------------------------------------------------------------------------------------------------
@@ -705,7 +713,8 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
         SENSOR_BME_TEMP_PROP_ID,
         SENSOR_BME_HUMI_PROP_ID,
         SENSOR_BME_PRES_PROP_ID,
-        SENSOR_BATTERY_PROP_ID
+        SENSOR_BATTERY_PROP_ID,
+        SENSOR_TEST_PROP_ID
     };
     const static uint16_t add_MIPDA = 0x2000;
 
@@ -791,3 +800,19 @@ int sensor_series_status_tx()
 }
 
 // Cadence, Settings and Setting in Sensor Setup Server - TX message producer functions
+
+
+int sensor_test_get_tx()
+// Always ask for the sensor test prop
+{
+    struct bt_mesh_model *model = &sig_models[3];   //use sensor server model
+    printk("\n\n TX test status\n");
+    //Start message
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_TEST_GET);
+    int payload_length;
+
+    net_buf_simple_add_le16(msg, SENSOR_TEST_PROP_ID);
+    payload_length = sizeof(msg);
+    prinkt("Msg send with %d length\n", payload_length);
+}
