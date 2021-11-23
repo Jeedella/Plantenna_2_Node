@@ -101,7 +101,7 @@ int init_SPMS()
             printk("[BT] My UUID is %d\n",rnd);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
             else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
-		#elif     
+		#elif __SPMS_BT == 2    
             bt_ctlr_set_public_addr(dev_uuid);        //Server
         #endif
         if(!bt_enable(spms_mesh_init)) printk("%s %s bluetooth\n", strPass, strInit);
