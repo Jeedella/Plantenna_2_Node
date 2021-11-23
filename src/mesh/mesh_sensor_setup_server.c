@@ -585,6 +585,22 @@ void sensor_test_get_rx(struct bt_mesh_model *model,
                             struct net_buf_simple *buf)
 {
     printk("\nTest Received\n");
+    uint16_t buflen = buf->len;
+    uint16_t prop_id = buf->data;
+    if (buflen) {
+		prop_id = net_buf_simple_pull_le16(buf);
+        printk("Received prop id: %d\n", prop_id);
+	}
+    else {
+        printk("Received no prop id, so reply with all sensors\n", prop_id);
+    }
+    //Reply to the message.
+    if(!sensor_data_status_tx(ctx, prop_id)) {
+        printk("Sensor Data Get processed without errors\n");
+    }
+    else {
+        printk("Sensor Data Get processed with errors\n");
+    }
 }
 
 // Descriptor, Data, Column and Series in Sensor Server - TX message producer functions
