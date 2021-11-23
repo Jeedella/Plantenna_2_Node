@@ -33,11 +33,11 @@ void updateHandler()
     printk("[Log] Current storage index is %d\n", get_local_storage_index());
     #if defined(__SPMS_BT)
         #if __SPMS_BT==1
-            printk("<dbg> I'm a node\n");
+            printk("[dbg] I'm a node\n");
             sensor_data.time = timeStamp;
             sensor_read(&sensor_data);
         #elif __SPMS_BT==2
-            printk("<dbg> I'm a server\n");
+            printk("[dbg] I'm a server\n");
         #endif
     #endif
     
@@ -55,10 +55,10 @@ void updateHandler()
 				// sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
 				// printk("Status msg sending done\n");
 			#else                   //Server
-				printk("Get msg sending...\n");
-				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
-                sensor_data_get_tx(0);
-				printk("Get msg sending done\n");
+				// printk("Get msg sending...\n");
+				// sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
+                // sensor_data_get_tx(0);
+				// printk("Get msg sending done\n");
 			#endif
         #endif
     }
@@ -101,8 +101,9 @@ int init_SPMS()
             printk("[BT] My UUID is %d\n",rnd);
 		    if (!init_sensor_model_local_storage()) printk("%s %s sensor model local storage\n", strPass, strInit);
             else {printk("%s %s local storage\n", strPass, strInit); status = status ^ ERROR;}
-		#endif      
-        bt_ctlr_set_public_addr(dev_uuid);        //Server
+		#elif     
+            bt_ctlr_set_public_addr(dev_uuid);        //Server
+        #endif
         if(!bt_enable(spms_mesh_init)) printk("%s %s bluetooth\n", strPass, strInit);
     #else
         if(!bt_enable(NULL)) printk("%s %s bluetooth\n", strPass, strInit);

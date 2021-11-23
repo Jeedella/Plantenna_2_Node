@@ -7,6 +7,36 @@
 #include"peripherals.h"
 #include "mesh_sensor_common.h"
 
+static struct k_work_delayable button_pressed;
+
+#define DEBOUNCE_INTERVAL 100
+
+static void button_pressed_fn(struct k_work *work)
+{
+		 #if defined(__SPMS_BT)
+			#if !__SPMS_BT
+				printk("Bu to n\n");
+			#elif __SPMS_BT==1 //Node
+				gpio_pin_set_dt(&led, 1);
+				sensor_descriptor_status_msg_pkt_t status;
+				status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
+				
+				printk("Status msg sending...\n");
+				sensor_data_status_tx(NULL, SENSOR_ALL_PROP_ID, true);
+				printk("Status msg sending done\n");
+				gpio_pin_set_dt(&led, 0);
+			#else				//Server
+				gpio_pin_set_dt(&led, 1);
+				printk("Get msg sending...\n");
+				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
+                sensor_data_get_tx(0);
+				printk("Get msg sending done\n");
+				gpio_pin_set_dt(&led, 0);
+			#endif
+        #endif
+}
+
+
 void perInit()
 {
 	int ret;
@@ -32,7 +62,7 @@ void perInit()
 		return;
 	}
 
-	gpio_init_callback(&button_cb_data, button_pressed, BIT(button.pin));
+	gpio_init_callback(&button_cb_data, button_pressed_isr, BIT(button.pin));
 	gpio_add_callback(button.port, &button_cb_data);
 	printk("Set up button at %s pin %d\n", button.port->name, button.pin);
 
@@ -52,31 +82,15 @@ void perInit()
 		}
 	}
 	gpio_pin_set_dt(&led, 0);
+
+	//Init work queue for button press
+	k_work_init_delayable(&button_pressed, button_pressed_fn);
 }
 
 
-void button_pressed(const struct device *dev, struct gpio_callback *cb,
+static void button_pressed_isr(const struct device *dev, struct gpio_callback *cb,
 		    uint32_t pins)
 {
-	 #if defined(__SPMS_BT)
-			#if !__SPMS_BT
-				printk("Bu to n\n");
-			#elif __SPMS_BT==1 //Node
-				gpio_pin_set_dt(&led, 1);
-				sensor_descriptor_status_msg_pkt_t status;
-				status.short_pkt.sensor_property_id = 0xFF;
-				
-				printk("Status msg sending...\n");
-				sensor_descriptor_status_tx(true, SENSOR_ALL_PROP_ID, true);
-				printk("Status msg sending done\n");
-				gpio_pin_set_dt(&led, 0);
-			#else				//Server
-				gpio_pin_set_dt(&led, 1);
-				printk("Get msg sending...\n");
-				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
-                sensor_data_get_tx(0);
-				printk("Get msg sending done\n");
-				gpio_pin_set_dt(&led, 0);
-			#endif
-        #endif
+	k_work_reschedule(&button_pressed, K_MSEC(DEBOUNCE_INTERVAL));
 }
+

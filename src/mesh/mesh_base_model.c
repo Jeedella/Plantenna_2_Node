@@ -112,11 +112,11 @@ struct bt_mesh_model sig_models[] = {
     // BT_MESH_MODEL_CFG_SRV(&cfg_srv),
     BT_MESH_MODEL_CFG_SRV,
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
-    #if defined(__SPMS_BT) && __SPMS_BT == 1
+    #if defined(__SPMS_BT) && __SPMS_BT == 1    //Node
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
         //BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_SRV, gen_onoff_srv_op, &gen_onoff_srv, NULL),
-    #else
+    #else                                       //Server
         BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_CLI, sensor_cli_op, &sensor_cli, NULL),
         //BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_CLI, gen_onoff_cli_op, &gen_onoff_cli, NULL),
     #endif
