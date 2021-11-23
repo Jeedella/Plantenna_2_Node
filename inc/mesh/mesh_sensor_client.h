@@ -94,6 +94,7 @@ static const struct bt_mesh_model_op sensor_cli_op[] = {
     {BT_MESH_MODEL_OP_SENSOR_CADENCE_STATUS,    0, sensor_cadence_status_rx},
     {BT_MESH_MODEL_OP_SENSOR_SETTINGS_STATUS,   0, sensor_settings_status_rx},
     {BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS,    0, sensor_setting_status_rx},
+    {BT_MESH_MODEL_OP_SENSOR_TEST_STATUS,       0, sensor_test_status_rx},
     BT_MESH_MODEL_OP_END,
 };
 

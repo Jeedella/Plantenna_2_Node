@@ -216,6 +216,12 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 // sensor_cli_op[] in header
 // sensor_cli in header
 
+void sensor_test_status_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf)
+{
+    //Test function
+}
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Client - TX message producer functions
