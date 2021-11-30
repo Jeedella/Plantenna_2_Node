@@ -369,7 +369,7 @@ int sensor_setting_set_unack_tx()
 int sensor_test_get_tx(uint16_t sensor_property_id)
 {
     struct bt_mesh_model *model = &sig_models[2];
-    
+    bool publish = true;
     if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
     {
         printk("No publish address associated with the sensor client model - add one with a configuration app like nRF Mesh\n");
