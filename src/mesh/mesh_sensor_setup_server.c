@@ -724,6 +724,17 @@ int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool 
 // Data
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
+    if  (ctx == NULL)
+    {
+        struct bt_mesh_msg_ctx ctx = {
+            .net_idx  = reply_net_idx,
+            .app_idx  = reply_app_idx,
+            .addr     = reply_addr,
+            .send_rel = true,
+            .send_ttl = reply_send_ttl,
+        };
+    }
+
     const static uint16_t id_lookup[NO_SENSORS] = {
         0,
         SENSOR_ALL_PROP_ID,
@@ -743,7 +754,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     get_sensor_series_index(get_local_storage_index() - 1, &sensor_data);
 
     int payload_length;
-    if(prop_id) payload_length = 5;    // Length marshall type A + sensor_raw (1 sensor)
+    if(prop_id != SENSOR_ALL_PROP_ID) payload_length = 5;    // Length marshall type A + sensor_raw (1 sensor)
     else payload_length = NO_SENSORS << 2;    // No_sensors * length 1 sensor(4)
     uint16_t payload[payload_length >> 1];    // Uint16_t so divide by 2
     printk("Reply message length is: %d\n", payload_length);
