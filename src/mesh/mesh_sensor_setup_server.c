@@ -726,6 +726,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
     const static uint16_t id_lookup[NO_SENSORS] = {
         0,
+        SENSOR_ALL_PROP_ID,
         SENSOR_BME_TEMP_PROP_ID,
         SENSOR_BME_HUMI_PROP_ID,
         SENSOR_BME_PRES_PROP_ID,
@@ -750,6 +751,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     for(int k = 0; k < (payload_length >> 2); k++) {
         switch(id_lookup[k] ^ prop_id) {
             case 0:
+            break;
             case SENSOR_AIRFLOW_PROP_ID:
                 payload[k << 1] = SENSOR_AIRFLOW_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.airf;
@@ -774,8 +776,11 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
                 payload[k << 1] = SENSOR_TEST_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.test;
                 break;
+            case SENSOR_ALL_PROP_ID:
+                //Nothing for now
+            break;
             default:
-                printk("Invalid property ID");
+                printk("Invalid property ID: 0x%x\n",prop_id);
                 return bt_mesh_SEND_FAILED;
         }
         printk("Val marshall[%d]: %d\n", k, payload[k << 1]);
@@ -786,10 +791,9 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     if(payload_length > 11) {
         sensor_status_ctx->send_rel = true;
     }
-
     net_buf_simple_add_mem(msg, payload, payload_length);
-
-    if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
+    //bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)
+    if(!bt_mesh_model_publish(model)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
     } 
