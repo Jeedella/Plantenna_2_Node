@@ -51,7 +51,7 @@ void updateHandler()
 				sensor_descriptor_status_msg_pkt_t status;
 				status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
 				printk("Status msg sending...\n");
-				sensor_data_status_tx(NULL, SENSOR_ALL_PROP_ID);
+				sensor_data_status_tx(NULL, 0);
 				printk("Status msg sending done\n");
 			#else                   //Server
 				// printk("Get msg sending...\n");

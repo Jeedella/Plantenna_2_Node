@@ -28,9 +28,9 @@ static void button_pressed_fn(struct k_work *work)
 			#else				//Server
 				gpio_pin_set_dt(&led, 1);
 				printk("Get msg sending...\n");
-				// sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
+				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
                 // sensor_data_get_tx(0);
-				sensor_test_get_tx(SENSOR_TEST_PROP_ID);
+				// sensor_test_get_tx(SENSOR_TEST_PROP_ID);
 				printk("Get msg sending done\n");
 				gpio_pin_set_dt(&led, 0);
 			#endif
