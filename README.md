@@ -1,52 +1,39 @@
 # Smart Plant Monitoring System Zephyr-based Node
 
-Repository that contains the sources for the node of the Smart Plant Monitoring System (SPMS) Fontys project. The program runs on [Zephyr RTOS](https://zephyrproject.org/) (version 2.4.0) and has been prototyped using the [nRF52 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52-DK) (nRF52832 SoC).
+Repository that contains the sources for the node of the Smart Plant Monitoring System (SPMS) Fontys project. The program runs on [Zephyr RTOS](https://zephyrproject.org/) (version 2.7.99) and has been prototyped using the [nRF52 DK](https://www.nordicsemi.com/Software-and-Tools/Development-Kits/nRF52-DK) (nRF52832 SoC).
 
 The main goal of the project is to make a proof of concept for a bluetooth mesh network of plant monitoring nodes. The data of all the nodes is collected by a [gateway](https://github.com/Jeedella/Plantenna_2_Gateway) and pushed to a [cloud database](https://github.com/Jeedella/Plantenna_2_Cloud) for potential further processing.
 
 ## How to run
-
-1. Setup a Zephyr development environment (version 2.4.0) following the Ubuntu [getting started guide](https://docs.zephyrproject.org/latest/getting_started/index.html) and make sure to replace the ``west init`` step with:
-    ````
-    west init ~/zephyrproject --mr zephyr-v2.4.0
-    ````
-    This makes sure the correct version of zephyr is installed. 
-
-    It is recommended to make use of an Ubuntu based machine, since the required Toolchains in the Nordic SDK are not supported on Windows or macOS. One can also virtualize Ubuntu ([WSL](https://ubuntu.com/wsl) or more preferably [Virtual box](https://www.virtualbox.org/)) to circumvent this issue. A short guide to setup Virtual box can be found [here](#Brief-Ubuntu-VM-setup-using-virtual-box).
-
-    > The "west flash" command will not work in WSL due it not having USB passthrough. [Here](#-Workaround-for-programming-jlink-devices-in-WSL) is a workaround.
-
-2. Change directory to your zephyr folder and clone this repository:
-
+To setup Zephyr development environment (version 2.7.99) their own guide can be followed [getting started guide] (https://docs.zephyrproject.org/latest/getting_started/index.html). The guide is complete but the final configurations are a bit vague. In the list below all the points mention in the starting guide are given with a bit more context:
+1. First follow the Zephyr installation guide to the point of [Install a Toolchain](https://docs.zephyrproject.org/latest/getting_started/index.html#:~:text=scripts%5Crequirements.txt-,Install%20a%20Toolchain,-A%20toolchain%20provides). Some notes of what is install
+    - Chocolatey is a software installer for packages as is used often in Linux based machines.
+    - 
+2.  For this project the [GNU Arm Embedded toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) was chosen as this is a very popular and well maintained compiler. This might not be the optimal and you are free to chose any other. If it is supported by Zephyr it will work and will follow the same process.
+    - Please install the toolchain in an easy to reach path (e.g C:\GNU) as this will make you life much easier later on.
+3. Now that the compiler is installed west needs to be able to find and use it. This will be done by setting global variable in Windows that point to the correct folder. To do this the open cmd.exe and set the following commands:
+    - ```setx ZEPHYR_TOOLCHAIN_VARIANT gnuarmemb```
+    - ```setx GNUARMEMB_TOOLCHAIN_PATH <Your path to the toolchain>```
+    - If you run into issues CMake is not finding the path try reinstalling CMake and in the worst case everything.
+4.  The project can now be pulled from git using the following commands:
     ```text
-    cd ~/zephyrproject/zephyr
+    cd %HOMEPATH%/zephyrproject/zephyr
     git clone https://github.com/Jeedella/Plantenna_2_Node.git
     ```
-
-    > When wanting to build the program outside of the zephyr environment do not forget to set its base path in .bashrc:
-    >
-    > ```text
-    > echo 'export ZEPHYR_BASE=~/zephyrproject/zephyr' >> ~/.bashrc
-    > ```
-
-3. If everything up to this point has been setup correctly, the program can be build and uploaded just like the zephyr samples. Since three bluetooth variants of the application exists (ble, mesh_server and mesh_client), the bluetooth type has to be specified first.
-
-    ```text
-    export SPMS_BT=<bluetooth_type>
-    west build -p auto -b nrf52dk_nrf52832 Plantenna_2_Node/
+    Git can directly be used or you can use [Github Desktop](https://desktop.github.com/) or [Sourcetree](https://www.sourcetreeapp.com/). These are Git GUI's and give a better visual understanding of all the changes and commits in a project.  
+    > Be aware that west does not work outside of the zephyrproject folder without changing its directory. 
+5. The project is installed and to verify that it works the blinky project can be build and flashed. This is done by:
+    ``` cmd
+    west build -p auto -b nrf52dk_nrf52832 /samples/basic/blinky
     west flash
     ```
-
-    > When using a different board, replace the nrf52dk_nrf52832 parameter with your own.
-
-    **Notes:**
-
-    * It is also possible to upload the program manually by drag and dropping the generated .hex file located in the `build/zephyr/` folder.
-    * When using [WSL](https://ubuntu.com/wsl), Ubuntu files can be found in the folder `\\wsl$\Ubuntu`.
-    * When having issues with building, try removing the build folder first before taking any other measures using:
-        ````text
-        rm -r build/
-        ````
+    If this builds and flashes without any error's the setup until has worked. Now you can try it with the Plantenna code yourself, but you need to give the build extra variables to program either the server or the node. This is done by:
+    ```
+    west build -p auto -b nrf52dk_nrf52832 Plantenna_2_Node/ -- -D SPMS_BT=<mesh_server/mesh_node/ble>
+    ```
+    These are variables that are passed on to the CMake list to switch between the different code bases. 
+    > You can set a default board with : ``` west config build.board nrf52dk_nrf52832```
+6. If at any point CMake can no longer find your GNU Toolchain try setting different global variables or reinstall Zephyr again. We also ran into the issue of CMake not finding it.
 
 ## Bluetooth Mesh sensor model
 The SPMS node contains code for the sensor client model and sensor server model. The sensor setup server model has not yet been implemented. The status regarding the sensor model is shown below:
