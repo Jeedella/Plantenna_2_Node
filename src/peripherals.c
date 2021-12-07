@@ -11,6 +11,7 @@ static struct k_work_delayable button_pressed;
 
 #define DEBOUNCE_INTERVAL 100
 
+
 static void button_pressed_fn(struct k_work *work)
 {
 		 #if defined(__SPMS_BT)
