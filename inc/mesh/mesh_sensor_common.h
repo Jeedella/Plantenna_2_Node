@@ -51,6 +51,11 @@
 #define BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS       BT_MESH_MODEL_OP_1(0x5B)
 
 
+//Custom test
+#define BT_MESH_MODEL_OP_SENSOR_TEST_GET            BT_MESH_MODEL_OP_2(0X82, 0X37)
+#define BT_MESH_MODEL_OP_SENSOR_TEST_STATUS         BT_MESH_MODEL_OP_1(0x5C)
+
+
 // -------------------------------------------------------------------------------------------------------
 // States (Ch4.1 MshMDLv1.0.1)
 // --------------------------

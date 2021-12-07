@@ -155,7 +155,6 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
     uint16_t* payload = net_buf_simple_pull_mem(buf, buflen);
     printk("Sender: \t %x",ctx->addr);
     printk(" |Packet length: %d\n", buflen);
-    uint16_t remove_MIPDA = 0x2000;
     for(int k = 0; k < (buflen >> 2); k++) {
         printk("Sensor\t[%d]:\t %s\n", k, sensor_names[GET_SENSOR(payload[k << 1])^remove_MIPDA]);
         printk("Data\t[%d]:\t %d\n", k, payload[(k << 1) + 1]);
@@ -216,6 +215,12 @@ void sensor_setting_status_rx(struct bt_mesh_model *model,
 // sensor_cli_op[] in header
 // sensor_cli in header
 
+void sensor_test_status_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf)
+{
+    //Test function
+}
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Client - TX message producer functions
@@ -359,3 +364,44 @@ int sensor_setting_set_unack_tx()
     printk("Sensor Setting Set Unack not implemented\n");
     return 0;
 }
+
+// Descriptor (can only be published)
+int sensor_test_get_tx(uint16_t sensor_property_id)
+{
+    struct bt_mesh_model *model = &sig_models[2];
+    bool publish = true;
+    if (publish && model->pub->addr == BT_MESH_ADDR_UNASSIGNED)
+    {
+        printk("No publish address associated with the sensor client model - add one with a configuration app like nRF Mesh\n");
+        return bt_mesh_PUBLISH_NOT_SET;
+    }
+    
+    // Init msg
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_TEST_GET);
+    
+    if (sensor_property_id)    // Not 0 -> send for single sensor (sensor's property id is specified)
+    {
+        // Add property ID to message
+        net_buf_simple_add_le16(msg, sensor_property_id);
+        printk("Message: 0x%x\n", sensor_property_id);
+    }
+    else
+    {
+        printk("Message does not contain a payload.\n");
+    }
+    
+    printk("Publishing descriptor get message...\n");
+    int err = bt_mesh_model_publish(model);
+    
+    if (err)
+    {
+        printk("bt_mesh_model_publish err %d\n", err);
+        return bt_mesh_PUBLISH_FAILED;
+    }
+    
+    // In test phase
+    printk("Sensor Descriptor Get message published/send without errors.\n");
+    return bt_mesh_SUCCEESS;
+}
+

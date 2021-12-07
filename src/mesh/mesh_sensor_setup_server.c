@@ -579,6 +579,30 @@ int sensor_setting_status_tx()
     return 0;
 }
 
+
+void sensor_test_get_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf)
+{
+    printk("\nTest Received\n");
+    uint16_t buflen = buf->len;
+    uint16_t prop_id = buf->data;
+    if (buflen) {
+		prop_id = net_buf_simple_pull_le16(buf);
+        printk("Received prop id: %d\n", prop_id);
+	}
+    else {
+        printk("Received no prop id, so reply with all sensors\n", prop_id);
+    }
+    //Reply to the message.
+    if(!sensor_data_status_tx(ctx, prop_id)) {
+        printk("Sensor Data Get processed without errors\n");
+    }
+    else {
+        printk("Sensor Data Get processed with errors\n");
+    }
+}
+
 // Descriptor, Data, Column and Series in Sensor Server - TX message producer functions
 
 // -------------------------------------------------------------------------------------------------------
@@ -700,12 +724,25 @@ int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool 
 // Data
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
+    if  (ctx == NULL)
+    {
+        struct bt_mesh_msg_ctx ctx = {
+            .net_idx  = reply_net_idx,
+            .app_idx  = reply_app_idx,
+            .addr     = reply_addr,
+            .send_rel = true,
+            .send_ttl = reply_send_ttl,
+        };
+    }
+
     const static uint16_t id_lookup[NO_SENSORS] = {
         0,
+        SENSOR_ALL_PROP_ID,
         SENSOR_BME_TEMP_PROP_ID,
         SENSOR_BME_HUMI_PROP_ID,
         SENSOR_BME_PRES_PROP_ID,
-        SENSOR_BATTERY_PROP_ID
+        SENSOR_BATTERY_PROP_ID,
+        SENSOR_TEST_PROP_ID
     };
     const static uint16_t add_MIPDA = 0x2000;
 
@@ -725,6 +762,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     for(int k = 0; k < (payload_length >> 2); k++) {
         switch(id_lookup[k] ^ prop_id) {
             case 0:
+            break;
             case SENSOR_AIRFLOW_PROP_ID:
                 payload[k << 1] = SENSOR_AIRFLOW_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.airf;
@@ -749,8 +787,11 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
                 payload[k << 1] = SENSOR_TEST_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.test;
                 break;
+            case SENSOR_ALL_PROP_ID:
+                //Nothing for now
+            break;
             default:
-                printk("Invalid property ID");
+                printk("Invalid property ID: 0x%x\n",prop_id);
                 return bt_mesh_SEND_FAILED;
         }
         printk("Val marshall[%d]: %d\n", k, payload[k << 1]);
@@ -761,10 +802,9 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     if(payload_length > 11) {
         sensor_status_ctx->send_rel = true;
     }
-
     net_buf_simple_add_mem(msg, payload, payload_length);
-
-    if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
+    //bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)
+    if(!bt_mesh_model_publish(model)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
     } 
@@ -791,3 +831,19 @@ int sensor_series_status_tx()
 }
 
 // Cadence, Settings and Setting in Sensor Setup Server - TX message producer functions
+
+
+int sensor_test_get_tx()
+// Always ask for the sensor test prop
+{
+    struct bt_mesh_model *model = &sig_models[3];   //use sensor server model
+    printk("\n\n TX test status\n");
+    //Start message
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_TEST_GET);
+    int payload_length;
+
+    net_buf_simple_add_le16(msg, SENSOR_TEST_PROP_ID);
+    payload_length = sizeof(msg);
+    prinkt("Msg send with %d length\n", payload_length);
+}

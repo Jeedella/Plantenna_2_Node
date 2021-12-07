@@ -22,14 +22,15 @@ static void button_pressed_fn(struct k_work *work)
 				status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
 				
 				printk("Status msg sending...\n");
-				sensor_data_status_tx(NULL, SENSOR_ALL_PROP_ID, true);
+				sensor_data_status_tx(true, 0, false);
 				printk("Status msg sending done\n");
 				gpio_pin_set_dt(&led, 0);
 			#else				//Server
 				gpio_pin_set_dt(&led, 1);
 				printk("Get msg sending...\n");
 				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
-                sensor_data_get_tx(0);
+                // sensor_data_get_tx(0);
+				// sensor_test_get_tx(SENSOR_TEST_PROP_ID);
 				printk("Get msg sending done\n");
 				gpio_pin_set_dt(&led, 0);
 			#endif
@@ -40,7 +41,7 @@ static void button_pressed_fn(struct k_work *work)
 void perInit()
 {
 	int ret;
-
+	printk("\n\n");
 	if (!device_is_ready(button.port)) {
 		printk("Error: button device %s is not ready\n",
 		       button.port->name);
@@ -82,7 +83,7 @@ void perInit()
 		}
 	}
 	gpio_pin_set_dt(&led, 0);
-
+	printk("\n\n");
 	//Init work queue for button press
 	k_work_init_delayable(&button_pressed, button_pressed_fn);
 }
