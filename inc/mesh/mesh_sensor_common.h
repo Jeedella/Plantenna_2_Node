@@ -370,14 +370,15 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define SENSOR_BATTERY_PROP_ID  0x554 // Id of unused sensor
 #define SENSOR_TEST_PROP_ID     0x541 // Id of test sensor
 
-#define GET_SENSOR(ID)({(ID == SENSOR_ALL_PROP_ID ? SENSOR_ALL_IDX : (ID == SENSOR_AIRFLOW_PROP_ID ? SENSOR_AIRFLOW_IDX :(ID==SENSOR_BME_TEMP_PROP_ID ? SENSOR_BME_TEMP_IDX : (ID==SENSOR_BME_HUMI_PROP_ID ? SENSOR_BME_HUMI_IDX : (ID == SENSOR_BME_PRES_PROP_ID ? SENSOR_BME_PRES_IDX : (ID==SENSOR_BATTERY_PROP_ID ? SENSOR_BATTERY_IDX : (ID==SENSOR_TEST_PROP_ID ? SENSOR_TEST_IDX : 0xFF))))))) ;})
+#define GET_SENSOR(ID)({(ID == SENSOR_ALL_PROP_ID ? SENSOR_ALL_IDX : (ID == SENSOR_AIRFLOW_PROP_ID ? SENSOR_AIRFLOW_IDX :(ID==SENSOR_BME_TEMP_PROP_ID ? SENSOR_BME_TEMP_IDX : (ID==SENSOR_BME_HUMI_PROP_ID ? SENSOR_BME_HUMI_IDX : (ID == SENSOR_BME_PRES_PROP_ID ? SENSOR_BME_PRES_IDX : (ID==SENSOR_BATTERY_PROP_ID ? SENSOR_BATTERY_IDX : (ID==SENSOR_TEST_PROP_ID ? SENSOR_TEST_IDX : 6))))))) ;})
 static const char* sensor_names[]={
     "Airflow",
     "Temperature",
     "Humidity",
     "Pressure",
     "Battery",
-    "Test"
+    "Test",
+    "WRONG ID"
 };
 
 #endif /* __SENSOR_COMMON_H */

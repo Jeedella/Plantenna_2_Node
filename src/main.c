@@ -55,7 +55,7 @@ void updateHandler()
 				// printk("Status msg sending done\n");
 			#else                   //Server
 				printk("Get msg sending...\n");
-				sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
+				// sensor_descriptor_get_tx(SENSOR_ALL_PROP_ID);
                 sensor_data_get_tx(0);
 				printk("Get msg sending done\n");
 			#endif
@@ -112,7 +112,7 @@ int init_SPMS()
     // Start "update" timer, callback every minute
     printk("[%s] update timer\n", strInit);
     k_timer_init(&updateTimer, updateHandler, NULL);
-    k_timer_start(&updateTimer, K_SECONDS(120), K_SECONDS(30));
+    k_timer_start(&updateTimer, K_SECONDS(30), K_SECONDS(30));
     printk("%s %s update timer\n", strPass, strInit);
 
     #if defined(__SPMS_BT) && !__SPMS_BT
