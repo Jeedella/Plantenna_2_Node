@@ -7,7 +7,7 @@ The main goal of the project is to make a proof of concept for a bluetooth mesh 
 ## How to run
 To setup Zephyr development environment (version 2.7.99) their own guide can be followed [getting started guide] (https://docs.zephyrproject.org/latest/getting_started/index.html). The guide is complete but the final configurations are a bit vague. In the list below all the points mention in the starting guide are given with a bit more context:
 1. First follow the Zephyr installation guide to the point of [Install a Toolchain](https://docs.zephyrproject.org/latest/getting_started/index.html#:~:text=scripts%5Crequirements.txt-,Install%20a%20Toolchain,-A%20toolchain%20provides). Some notes of what is install
-   > Chocolatey is a software installer for packages as is used often in Linux based machines.
+   > Chocolatey is a software installer for packages as is used often in Linux based machines, but for Windows.
 
 2.  For this project the [GNU Arm Embedded toolchain](https://developer.arm.com/tools-and-software/open-source-software/developer-tools/gnu-toolchain/gnu-rm/downloads) was chosen as this is a very popular and well maintained compiler. This might not be the optimal and you are free to chose any other. If it is supported by Zephyr it will work and will follow the same process.
     - Please install the toolchain in an easy to reach path (e.g C:\GNU) as this will make you life much easier later on.
@@ -33,8 +33,8 @@ To setup Zephyr development environment (version 2.7.99) their own guide can be 
     ```
     These are variables that are passed on to the CMake list to switch between the different code bases. 
     > You can set a default board with : ``` west config build.board nrf52dk_nrf52832```
-6. If at any point CMake can no longer find your GNU Toolchain try setting different global variables or reinstall Zephyr again. We also ran into the issue of CMake not finding it.
-
+6. If at any point CMake can no longer find your GNU Toolchain try resetting the global variables or reinstall Zephyr again.
+7. 
 ## Bluetooth Mesh sensor model
 The SPMS node contains code for the sensor client model and sensor server model. The sensor setup server model has not yet been implemented. The status regarding the sensor model is shown below:
 
