@@ -5,7 +5,7 @@ Repository that contains the sources for the node of the Smart Plant Monitoring 
 The main goal of the project is to make a proof of concept for a bluetooth mesh network of plant monitoring nodes. The data of all the nodes is collected by a [gateway](https://github.com/Jeedella/Plantenna_2_Gateway) and pushed to a [cloud database](https://github.com/Jeedella/Plantenna_2_Cloud) for potential further processing.
 
 ## How to run
-To setup Zephyr development environment (version 2.7.99) their own guide can be followed [getting started guide] (https://docs.zephyrproject.org/latest/getting_started/index.html). The guide is complete but the final configurations are a bit vague. In the list below all the points mention in the starting guide are given with a bit more context:
+To setup Zephyr development environment (version 2.7.99) their own guide can be followed [getting started guide](https://docs.zephyrproject.org/latest/getting_started/index.html). The guide is complete but the final configurations are a bit vague. In the list below all the points mention in the starting guide are given with a bit more context:
 1. First follow the Zephyr installation guide to the point of [Install a Toolchain](https://docs.zephyrproject.org/latest/getting_started/index.html#:~:text=scripts%5Crequirements.txt-,Install%20a%20Toolchain,-A%20toolchain%20provides). Some notes of what is install
    > Chocolatey is a software installer for packages as is used often in Linux based machines, but for Windows.
 
