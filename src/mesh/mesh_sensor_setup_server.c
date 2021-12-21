@@ -744,6 +744,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
         SENSOR_BATTERY_PROP_ID,
         SENSOR_TEST_PROP_ID
     };
+
     const static uint16_t add_MIPDA = 0x2000;
 
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
@@ -762,7 +763,6 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     for(int k = 0; k < (payload_length >> 2); k++) {
         switch(id_lookup[k] ^ prop_id) {
             case 0:
-            break;
             case SENSOR_AIRFLOW_PROP_ID:
                 payload[k << 1] = SENSOR_AIRFLOW_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.airf;
@@ -797,14 +797,13 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
         printk("Val marshall[%d]: %d\n", k, payload[k << 1]);
         printk("Val sensor[%d]: %d\n", k, payload[(k << 1) + 1]);
     }
-
     struct bt_mesh_msg_ctx *sensor_status_ctx = ctx;
     if(payload_length > 11) {
         sensor_status_ctx->send_rel = true;
     }
     net_buf_simple_add_mem(msg, payload, payload_length);
-    //bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)
-    if(!bt_mesh_model_publish(model)) {
+    //!bt_mesh_model_publish(model)
+    if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
     } 

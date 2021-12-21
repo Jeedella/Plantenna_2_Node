@@ -17,6 +17,9 @@ int local_storage_init() {
 // Add a new data set of airflow_local to the local storage
 int add_sensor_series(airflow_local sensor_data) {
     if(storageIndex < 512) {
+        // airflow_local *new;
+        // new = (airflow_local*) malloc(sizeof(airflow_local))
+        // new = *sensor_data; 
         memcpy(&localStorage[storageIndex], &sensor_data, sizeof(airflow_local));
         storageIndex++;
         return 0;
@@ -26,6 +29,15 @@ int add_sensor_series(airflow_local sensor_data) {
     }
 }
 
+// Removes the local data at the given index. 
+int remove_sensor_series(int index){
+    if(index > 512) 
+        {return -1;}
+    for(int i = index;i<storageIndex;i++)
+        { localStorage[i] = localStorage[i+1]; }
+    storageIndex--;
+    return 0;
+}
 // Get the local storage index of the next unassigned local storage entry
 int get_local_storage_index() {
     return storageIndex;
