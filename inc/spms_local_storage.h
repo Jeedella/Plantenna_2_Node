@@ -39,6 +39,9 @@ int local_storage_init();
 */
 int add_sensor_series(airflow_local sensor_data);
 
+// Removes the local data at the given index. 
+int remove_sensor_series(int index);
+
 // Get the local storage index of the next unassigned local storage entry
 /*
     returns the local storage index 
