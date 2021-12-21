@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.20.1)
 find_package(Zephyr REQUIRED HINTS $ENV{ZEPHYR_BASE})
 project(zephyr_node)
-
+zephyr_compile_definitions(PROJECT_NAME=${PROJECT_NAME} VENDOR_EVENT_DONE_MAX=5)
 #Add compiler definitions and sources
 message(STATUS "$SPMS is " ${SPMS_BT}) 
 if(${SPMS_BT} MATCHES ble)
