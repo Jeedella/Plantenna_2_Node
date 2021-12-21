@@ -737,7 +737,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 
     const static uint16_t id_lookup[NO_SENSORS] = {
         0,
-        SENSOR_ALL_PROP_ID,
+        // SENSOR_ALL_PROP_ID,
         SENSOR_BME_TEMP_PROP_ID,
         SENSOR_BME_HUMI_PROP_ID,
         SENSOR_BME_PRES_PROP_ID,
@@ -787,9 +787,9 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
                 payload[k << 1] = SENSOR_TEST_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.test;
                 break;
-            case SENSOR_ALL_PROP_ID:
-                //Nothing for now
-            break;
+            // case SENSOR_ALL_PROP_ID:
+            //     //Nothing for now
+            // break;
             default:
                 printk("Invalid property ID: 0x%x\n",prop_id);
                 return bt_mesh_SEND_FAILED;
@@ -844,5 +844,5 @@ int sensor_test_get_tx()
 
     net_buf_simple_add_le16(msg, SENSOR_TEST_PROP_ID);
     payload_length = sizeof(msg);
-    prinkt("Msg send with %d length\n", payload_length);
+    printk("Msg send with %d length\n", payload_length);
 }
