@@ -160,13 +160,12 @@ void sensor_data_status_rx(struct bt_mesh_model *model,
         printk("Sensor\t[%d]:\t %4s\n", k, sensor_names[GET_SENSOR((payload[k << 1]^remove_MIPDA))]);
         // printk("Sensor\t[%d]:\t %x\n", k, payload[k << 1]^remove_MIPDA );
         printk("Data\t[%d]:\t %d\n", k, payload[(k << 1) + 1]);
-
     }
     incomingData = store_payload(incomingData, payload);
-    // if(!add_sensor_series(incomingData))
-    // {
-    //     send_to_cloud();
-    // }
+    if(!add_sensor_series(incomingData))
+    {
+        send_to_cloud();
+    }
     return;
 }
 
