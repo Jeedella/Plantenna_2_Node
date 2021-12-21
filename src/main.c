@@ -22,6 +22,7 @@
 #include "mesh_base_model.h"
 // globals
 static struct k_timer updateTimer;
+static struct k_timer updateStorage;
 static const uint8_t device_id[5];
 // Timer expire handler
 void updateHandler()
@@ -43,11 +44,12 @@ void updateHandler()
     
     //ccs811_main(); 
     //do_fetch_ccs811(dev, &localStorage[storageIndex]);
-    if(!add_sensor_series(sensor_data)) {
-        #if defined(__SPMS_BT)
+    #if defined(__SPMS_BT)
 			#if !__SPMS_BT
 				ble_update_airflow(&sensor_data, (uint8_t)sys_rand32_get());
 			#elif __SPMS_BT==1      //Node
+                if(!add_sensor_series(sensor_data)) printk("[%d] Stored data\n", get_local_storage_index());
+                else                                printk("[Error] local storage out of memory\n");
 				// sensor_descriptor_status_msg_pkt_t status;
 				// status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
 				// printk("Status msg sending...\n");
@@ -60,8 +62,6 @@ void updateHandler()
 				printk("Get msg sending done\n");
 			#endif
         #endif
-    }
-    else printk("[Error] local storage out of memory\n");
 }
 
 // Initialization
@@ -112,7 +112,9 @@ int init_SPMS()
     // Start "update" timer, callback every minute
     printk("[%s] update timer\n", strInit);
     k_timer_init(&updateTimer, updateHandler, NULL);
-    k_timer_start(&updateTimer, K_SECONDS(30), K_SECONDS(30));
+    k_timer_start(&updateTimer, K_SECONDS(5), K_SECONDS(5));
+    k_timer_init(&updateStorage, print_storage_all,NULL);
+    k_timer_start(&updateStorage, K_SECONDS(15), K_SECONDS(15));
     printk("%s %s update timer\n", strPass, strInit);
 
     #if defined(__SPMS_BT) && !__SPMS_BT
