@@ -67,4 +67,9 @@ int send_to_cloud();
 
 // Stores the data into the airflow struc
 airflow_local store_payload(airflow_local data, uint16_t* payload);
+
+//Print all storages
+void print_storage_all();
+//Print index storage
+void print_storage(int index);
 #endif
