@@ -53,3 +53,47 @@ int get_sensor_series_index(int index, airflow_local* sensor_data) {
         return -1;
     }
 }
+
+int remove_local_storage_index(int index) {
+    if(index > 512)
+    {
+        return -1;
+    }
+    else if(index <= 512){
+        /* Copy next element value to current element */
+        for(int i=index-1; i<storageIndex-1; i++)
+        {
+            localStorage[i] = localStorage[i + 1];
+        }
+        /* Decrement array size by 1 */
+        storageIndex--;
+        // Free up the memory
+        free(localStorage[index]);
+        return 0;
+    }
+}
+
+// Sends the local storage to the cloud
+int send_to_cloud() {
+    for(int i = 0; i<storageIndex;i++)
+    {
+        printk(localStorage[i].time);
+        if(!remove_local_storage_index(i))
+        {
+            printk("Succes\n");
+        }
+    }
+}
+
+// Stores the data into the airflow struc
+airflow_local store_payload(airflow_local data, uint16_t* payload)
+{
+    data.time = 69;//payload[1];
+    data.temp = payload[1];
+    data.humi = payload[3];
+    data.pres = payload[5];
+    data.batt = payload[7];
+    data.airf = payload[9];
+    data.test = payload[11];
+    return data;
+}
