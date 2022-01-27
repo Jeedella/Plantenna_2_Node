@@ -83,13 +83,13 @@ int send_to_cloud() {
             if(!remove_sensor_series(i))
             {
                 printk("Succes, SI:%d\n",storageIndex);
-                cloud_connected = !cloud_connected;
+                // cloud_connected = !cloud_connected;
                 ret =  0;
             }
         }
         else {
             printk("Cloud not connected, Ind=%d\n",storageIndex);
-            cloud_connected = !cloud_connected;
+            // cloud_connected = !cloud_connected;
         }
     }
     return ret;
