@@ -801,8 +801,8 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     if(payload_length > 11) {
         sensor_status_ctx->send_rel = true;
     }
-    net_buf_simple_add_mem(msg, payload, payload_length);
     //!bt_mesh_model_publish(model)
+    net_buf_simple_add_mem(msg, payload, payload_length);
     if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
