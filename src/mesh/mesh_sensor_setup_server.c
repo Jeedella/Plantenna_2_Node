@@ -121,6 +121,15 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
         cadenceLocalStorage[SENSOR_BME_PRES_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
+         // Test sensor //
+        cadenceLocalStorage[SENSOR_TEST_IDX].sensor_property             = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].fast_cadence_period_divisor = 0;                         // Divisor for the Publish Period (7 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_type         = 1;                         // Defines the unit and format of the Status Trigger Delta filed (1 bit)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_delta_down   = 2;                         // (Variable) Delta down value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_trigger_delta_up     = 3;                         // (Variable) Delta up   value that triggters a status message   (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_min_interval         = 4;                         // Minimum interval between two consecutive Status messages (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_cadence_low          = 5;                         // (Variable) Low  value of the fast cadence range (8 bits)
+        cadenceLocalStorage[SENSOR_TEST_IDX].status_cadence_high         = 6;                         // (Variable) High value of the fast cadence range (8 bits)
     #else
         fail += 0b1;
     #endif
@@ -142,6 +151,10 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         
         // BME pressure sensor //
         settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_property_id     = SENSOR_BME_PRES_PROP_ID;    // Property ID of the sensor (16 bits)
+        //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
+        
+        // Test sensor //
+        settingsLocalStorage[SENSOR_TEST_IDX].sensor_property_id     = SENSOR_TEST_PROP_ID;    // Property ID of the sensor (16 bits)
         //settingsLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[] = 1;                         // (Variable) A sequence of N Sensor Setting Property IDs identifying settings within a sensor, where N is the number of property IDs including the messages (16 bits)
     #else
         fail += 0b1 << 1;
@@ -173,6 +186,12 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
         settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
         //settingLocalStorage[SENSOR_BME_PRES_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
+        
+        // Test sensor //
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_property_id         = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_property_id = 0;                         // Property ID of the setting within the sensor (16 bits)
+        settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_access      = 1;                         // Read/Write access rights of the setting (8 bits)
+        //settingLocalStorage[SENSOR_TEST_IDX].sensor_setting_raw[]       = 1;                         // (Variable) Raw value of a setting within the sensor (8 bits)
     #else
         fail += 0b1 << 2;
     #endif
@@ -211,6 +230,14 @@ int init_sensor_model_local_storage() // TODO: Fill in all data members, except 
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
         descriptorLocalStorage[SENSOR_BME_PRES_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
+
+        // Test sensor //
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_property_id        = SENSOR_TEST_PROP_ID;   // Property ID of the sensor (16 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_positive_tolerance = 0;                         // Sensor positive tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_negative_tolerance = 1;                         // Sensor negative tolerance (12 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_sampling_function  = 2;                         // Sensor sampling function  (8 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_measurement_period = 3;                         // Sensor measuremnt period  (8 bits)
+        descriptorLocalStorage[SENSOR_TEST_IDX].sensor_update_interval    = 4;                         // Sensor update interval    (8 bits)
     #else
         fail += 0b1 << 3;
     #endif
@@ -241,7 +268,9 @@ int get_idx_sensor_model_local_storage(uint16_t sensor_prop_id, int* sensor_idx_
         case SENSOR_BATTERY_PROP_ID:
             *sensor_idx_buff = SENSOR_BATTERY_IDX;
             break;
-        
+        case SENSOR_TEST_PROP_ID:
+            *sensor_idx_buff = SENSOR_TEST_IDX;
+            break;
         case SENSOR_ALL_PROP_ID:
             *sensor_idx_buff = SENSOR_ALL_IDX;
             break;
@@ -275,6 +304,9 @@ int get_prop_id_sensor_model_local_storage( int sensor_idx, uint16_t* sensor_pro
         
         case SENSOR_BATTERY_IDX:
             *sensor_prop_id_buff = SENSOR_BATTERY_PROP_ID;
+            break;
+        case SENSOR_TEST_IDX:
+            *sensor_prop_id_buff = SENSOR_TEST_PROP_ID;
             break;
         
         case  SENSOR_ALL_IDX:
@@ -547,6 +579,30 @@ int sensor_setting_status_tx()
     return 0;
 }
 
+
+void sensor_test_get_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf)
+{
+    printk("\nTest Received\n");
+    uint16_t buflen = buf->len;
+    uint16_t prop_id = buf->data;
+    if (buflen) {
+		prop_id = net_buf_simple_pull_le16(buf);
+        printk("Received prop id: %d\n", prop_id);
+	}
+    else {
+        printk("Received no prop id, so reply with all sensors\n", prop_id);
+    }
+    //Reply to the message.
+    if(!sensor_data_status_tx(ctx, prop_id)) {
+        printk("Sensor Data Get processed without errors\n");
+    }
+    else {
+        printk("Sensor Data Get processed with errors\n");
+    }
+}
+
 // Descriptor, Data, Column and Series in Sensor Server - TX message producer functions
 
 // -------------------------------------------------------------------------------------------------------
@@ -668,13 +724,27 @@ int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool 
 // Data
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
 {
+    if  (ctx == NULL)
+    {
+        struct bt_mesh_msg_ctx ctx = {
+            .net_idx  = reply_net_idx,
+            .app_idx  = reply_app_idx,
+            .addr     = reply_addr,
+            .send_rel = true,
+            .send_ttl = reply_send_ttl,
+        };
+    }
+
     const static uint16_t id_lookup[NO_SENSORS] = {
         0,
+        // SENSOR_ALL_PROP_ID,
         SENSOR_BME_TEMP_PROP_ID,
         SENSOR_BME_HUMI_PROP_ID,
         SENSOR_BME_PRES_PROP_ID,
-        SENSOR_BATTERY_PROP_ID
+        SENSOR_BATTERY_PROP_ID,
+        SENSOR_TEST_PROP_ID
     };
+
     const static uint16_t add_MIPDA = 0x2000;
 
     struct bt_mesh_model *model = &sig_models[3];    // Use sensor_server model
@@ -685,7 +755,7 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
     get_sensor_series_index(get_local_storage_index() - 1, &sensor_data);
 
     int payload_length;
-    if(prop_id) payload_length = 4;    // Length marshall type A + sensor_raw (1 sensor)
+    if(prop_id) payload_length = 5;    // Length marshall type A + sensor_raw (1 sensor)
     else payload_length = NO_SENSORS << 2;    // No_sensors * length 1 sensor(4)
     uint16_t payload[payload_length >> 1];    // Uint16_t so divide by 2
     printk("Reply message length is: %d\n", payload_length);
@@ -713,21 +783,26 @@ int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id)
                 payload[k << 1] = SENSOR_BATTERY_PROP_ID ^ add_MIPDA;
                 payload[(k << 1) + 1] = sensor_data.batt;
                 break;
+            case SENSOR_TEST_PROP_ID:
+                payload[k << 1] = SENSOR_TEST_PROP_ID ^ add_MIPDA;
+                payload[(k << 1) + 1] = sensor_data.test;
+                break;
+            // case SENSOR_ALL_PROP_ID:
+            //     //Nothing for now
+            // break;
             default:
-                printk("Invalid property ID");
+                printk("Invalid property ID: 0x%x\n",prop_id);
                 return bt_mesh_SEND_FAILED;
         }
         printk("Val marshall[%d]: %d\n", k, payload[k << 1]);
         printk("Val sensor[%d]: %d\n", k, payload[(k << 1) + 1]);
     }
-
     struct bt_mesh_msg_ctx *sensor_status_ctx = ctx;
     if(payload_length > 11) {
         sensor_status_ctx->send_rel = true;
     }
-
+    //!bt_mesh_model_publish(model)
     net_buf_simple_add_mem(msg, payload, payload_length);
-
     if(!bt_mesh_model_send(model, sensor_status_ctx, msg, NULL, NULL)) {
         printk("Sensor data status message published/send without errors.\n");
         return bt_mesh_SUCCEESS;
@@ -755,3 +830,19 @@ int sensor_series_status_tx()
 }
 
 // Cadence, Settings and Setting in Sensor Setup Server - TX message producer functions
+
+
+int sensor_test_get_tx()
+// Always ask for the sensor test prop
+{
+    struct bt_mesh_model *model = &sig_models[3];   //use sensor server model
+    printk("\n\n TX test status\n");
+    //Start message
+    struct net_buf_simple *msg = model->pub->msg;
+    bt_mesh_model_msg_init(msg, BT_MESH_MODEL_OP_SENSOR_TEST_GET);
+    int payload_length;
+
+    net_buf_simple_add_le16(msg, SENSOR_TEST_PROP_ID);
+    payload_length = sizeof(msg);
+    printk("Msg send with %d length\n", payload_length);
+}

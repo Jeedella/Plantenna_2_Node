@@ -19,6 +19,7 @@ typedef struct {
     uint16_t    pres;
     uint8_t     batt;
     uint16_t    airf;
+    uint16_t    test;
 } airflow_local;
 
 // Amount of airflow_local that are allocated  
@@ -38,6 +39,9 @@ int local_storage_init();
 */
 int add_sensor_series(airflow_local sensor_data);
 
+// Removes the local data at the given index. 
+int remove_sensor_series(int index);
+
 // Get the local storage index of the next unassigned local storage entry
 /*
     returns the local storage index 
@@ -53,4 +57,19 @@ int get_local_storage_index();
 */ 
 int get_sensor_series(int index, airflow_local* sensor_data);
 
+// Sends the local storage to the cloud
+/** 
+ *  Tries to send all the local storage to the cloud. 
+ *  If the cloud is not connected it will retry in 5 min. 
+ * 
+ */
+int send_to_cloud();
+
+// Stores the data into the airflow struc
+airflow_local store_payload(airflow_local data, uint16_t* payload);
+
+//Print all storages
+void print_storage_all();
+//Print index storage
+void print_storage(int index);
 #endif

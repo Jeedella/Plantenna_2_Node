@@ -51,6 +51,11 @@
 #define BT_MESH_MODEL_OP_SENSOR_SETTING_STATUS       BT_MESH_MODEL_OP_1(0x5B)
 
 
+//Custom test
+#define BT_MESH_MODEL_OP_SENSOR_TEST_GET            BT_MESH_MODEL_OP_2(0X82, 0X37)
+#define BT_MESH_MODEL_OP_SENSOR_TEST_STATUS         BT_MESH_MODEL_OP_1(0x5C)
+
+
 // -------------------------------------------------------------------------------------------------------
 // States (Ch4.1 MshMDLv1.0.1)
 // --------------------------
@@ -345,7 +350,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 // Indexes and property IDs
 // --------------------------
 // Number of sensors and thus number of states
-#define NO_SENSORS 5
+#define NO_SENSORS 6
 
 // Indexes
 #define SENSOR_ALL_IDX     0xFFFF // All idx must be used (do NOT use for messages, only for examening a payload)
@@ -354,6 +359,7 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define SENSOR_BME_HUMI_IDX  2    // BME sensor - humidity
 #define SENSOR_BME_PRES_IDX  3    // BME sensor - pressure
 #define SENSOR_BATTERY_IDX   4    // BME sensor - pressure
+#define SENSOR_TEST_IDX      5    // Test sensor
 
 // Sensor property IDs (see https://specificationrefs.bluetooth.com/assigned-values/Appearance%20Values.pdf)
 #define SENSOR_ALL_PROP_ID      0xFFFF // Used to specify that all prop ids must be used (do NOT use for messages, only for examening a payload)
@@ -362,5 +368,17 @@ typedef sensor_setting_status_msg_pkt_t_union sensor_setting_status_msg_pkt_t;
 #define SENSOR_BME_HUMI_PROP_ID 0x544 // Id of humidity sensor
 #define SENSOR_BME_PRES_PROP_ID 0x553 // Id of unused sensor
 #define SENSOR_BATTERY_PROP_ID  0x554 // Id of unused sensor
+#define SENSOR_TEST_PROP_ID     0x541 // Id of test sensor
+
+#define GET_SENSOR(ID)({(ID == SENSOR_ALL_PROP_ID ? SENSOR_ALL_IDX : (ID == SENSOR_AIRFLOW_PROP_ID ? SENSOR_AIRFLOW_IDX :(ID==SENSOR_BME_TEMP_PROP_ID ? SENSOR_BME_TEMP_IDX : (ID==SENSOR_BME_HUMI_PROP_ID ? SENSOR_BME_HUMI_IDX : (ID == SENSOR_BME_PRES_PROP_ID ? SENSOR_BME_PRES_IDX : (ID==SENSOR_BATTERY_PROP_ID ? SENSOR_BATTERY_IDX : (ID==SENSOR_TEST_PROP_ID ? SENSOR_TEST_IDX : 6))))))) ;})
+static const char* sensor_names[]={
+    "Airflow",
+    "Temperature",
+    "Humidity",
+    "Pressure",
+    "Battery",
+    "Test",
+    "WRONG ID"
+};
 
 #endif /* __SENSOR_COMMON_H */

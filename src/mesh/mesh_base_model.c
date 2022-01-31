@@ -40,12 +40,7 @@
 #include <settings/settings.h>
 #include <bluetooth/mesh/proxy.h>
 
-// Select UUID - This is for testing with 1 client and 1 server
-#if defined(__SPMS_BT) && __SPMS_BT==1
-    static const uint8_t dev_uuid[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x01 };
-#else
-	static const uint8_t dev_uuid[16] = { 0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08,0x09, 0x0A, 0x0B, 0x0C, 0x0D, 0x0E, 0x00 };
-#endif
+
 
 // -------------------------------------------------------------------------------------------------------
 // Provisioning functions
@@ -91,15 +86,15 @@ static const struct bt_mesh_prov prov = {
 // -------------------------------------------------------------------------------------------------------
 // Configuration Server
 // --------------------
-static struct bt_mesh_cfg_srv cfg_srv = {
-    .relay = BT_MESH_RELAY_DISABLED,
-    .beacon = BT_MESH_BEACON_DISABLED,
-    .frnd = BT_MESH_FRIEND_NOT_SUPPORTED,
-    .gatt_proxy = BT_MESH_GATT_PROXY_ENABLED,
-    .default_ttl = 7,
-    /* 3 transmissions with 20ms interval */
-    .net_transmit = BT_MESH_TRANSMIT(2, 20),
-};
+// static struct bt_mesh_cfg cfg_srv = {
+//     .relay = BT_MESH_RELAY_DISABLED,
+//     .beacon = BT_MESH_BEACON_DISABLED,
+//     .frnd = BT_MESH_FRIEND_NOT_SUPPORTED,
+//     .gatt_proxy = BT_MESH_GATT_PROXY_ENABLED,
+//     .default_ttl = 7,
+//     /* 3 transmissions with 20ms interval */
+//     .net_transmit = BT_MESH_TRANSMIT(2, 20),
+// };
 
 // -------------------------------------------------------------------------------------------------------
 // Health Server
@@ -114,17 +109,10 @@ static struct bt_mesh_health_srv health_srv = {
 // -----------
 // elements contain models (1 or more)
 struct bt_mesh_model sig_models[] = {
-    BT_MESH_MODEL_CFG_SRV(&cfg_srv),
+    BT_MESH_MODEL_CFG_SRV,
     BT_MESH_MODEL_HEALTH_SRV(&health_srv, &health_pub),
-    #if defined(__SPMS_BT) && __SPMS_BT == 1
-        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
-        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
-        //BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_SRV, gen_onoff_srv_op, &gen_onoff_srv, NULL),
-    #else
-        BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_CLI, sensor_cli_op, &sensor_cli, NULL),
-        //BT_MESH_MODEL(BT_MESH_MODEL_ID_GEN_ONOFF_CLI, gen_onoff_cli_op, &gen_onoff_cli, NULL),
-    #endif
-    // If needed, add more models here //
+    BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SETUP_SRV, sensor_setup_srv_op, &sensor_setup_srv, NULL),
+    BT_MESH_MODEL(BT_MESH_MODEL_ID_SENSOR_SRV, sensor_srv_op, &sensor_srv, NULL),
 };
 
 // If needed, add ven_models[]  here //

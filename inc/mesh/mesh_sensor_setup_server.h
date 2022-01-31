@@ -92,7 +92,7 @@ int get_data_sensor_model_local_storage(int sensor_idx, int state_idx, sensor_mo
 
 // -------------------------------------------------------------------------------------------------------
 // Sensor Setup Server Model
-// --------------------------
+// -------------------------
 // sensor server - handler functions for this model's RX messages
 // Cadence //
 void sensor_cadence_get_rx(struct bt_mesh_model *model,
@@ -171,12 +171,17 @@ void sensor_series_get_rx(struct bt_mesh_model *model,
 int sensor_descriptor_status_tx(bool publish, uint16_t sensor_property_id, bool only_sensor_property_id);
 int sensor_data_status_tx(struct bt_mesh_msg_ctx *ctx, uint16_t prop_id);
 
+void sensor_test_get_rx(struct bt_mesh_model *model,
+                            struct bt_mesh_msg_ctx *ctx,
+                            struct net_buf_simple *buf);
+
 // Opcode
 static const struct bt_mesh_model_op sensor_srv_op[] = {
     {BT_MESH_MODEL_OP_SENSOR_DESCRIPTOR_GET, 0, sensor_descriptor_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_DATA_GET,       0, sensor_data_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_COLUMN_GET,     2, sensor_column_get_rx},
     {BT_MESH_MODEL_OP_SENSOR_SERIES_GET,     2, sensor_series_get_rx},
+    {BT_MESH_MODEL_OP_SENSOR_TEST_GET,       0, sensor_test_get_rx},
     BT_MESH_MODEL_OP_END,
 };
 
