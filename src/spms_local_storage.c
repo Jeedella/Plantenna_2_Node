@@ -7,7 +7,8 @@ static unsigned storageIndex = 0;
 
 // Initialize the local storage
 int local_storage_init() {
-    localStorage = k_malloc(HEAP_SIZE * sizeof(airflow_local));
+    //Node only needs one storage
+    localStorage = k_malloc(sizeof(airflow_local));
     if(!localStorage) {
         return -1;
     }
@@ -16,14 +17,9 @@ int local_storage_init() {
 
 // Add a new data set of airflow_local to the local storage
 int add_sensor_series(airflow_local sensor_data) {
-    if(storageIndex < 512) {
-        memcpy(&localStorage[storageIndex], &sensor_data, sizeof(airflow_local));
-        storageIndex++;
-        return 0;
-    }
-    else {
-        return -1;
-    }
+    memcpy(&localStorage[0], &sensor_data, sizeof(airflow_local));
+    storageIndex = 1;
+    return 0;
 }
 
 // Removes the local data at the given index. 
@@ -51,24 +47,6 @@ int get_sensor_series_index(int index, airflow_local* sensor_data) {
     }
 }
 
-// int remove_local_storage_index(int index) {
-//     if(index > 512)
-//     {
-//         return -1;
-//     }
-//     else if(index <= 512){
-//         /* Copy next element value to current element */
-//         for(int i=index-1; i<storageIndex-1; i++)
-//         {
-//             localStorage[i] = localStorage[i + 1];
-//         }
-//         /* Decrement array size by 1 */
-//         storageIndex--;
-//         // Free up the memory
-//         free(localStorage[index]);
-//         return 0;
-//     }
-// }
 
 bool cloud_connected = true;
 // Sends the local storage to the cloud

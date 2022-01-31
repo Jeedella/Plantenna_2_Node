@@ -39,8 +39,8 @@ void updateHandler()
     
     //ccs811_main(); 
     //do_fetch_ccs811(dev, &localStorage[storageIndex]);
-    if(!add_sensor_series(sensor_data)) printk("[%d] Stored data\n", get_local_storage_index());
-    else                                printk("[Error] local storage out of memory\n");
+    add_sensor_series(sensor_data);
+    print_storage_all();
     // sensor_descriptor_status_msg_pkt_t status;
     // status.short_pkt.sensor_property_id = SENSOR_ALL_PROP_ID;
     // printk("Status msg sending...\n");
@@ -95,8 +95,8 @@ int init_SPMS()
     printk("[%s] update timer\n", strInit);
     k_timer_init(&updateTimer, updateHandler, NULL);
     k_timer_start(&updateTimer, K_SECONDS(30), K_SECONDS(30));
-    k_timer_init(&updateStorage, print_storage_all,NULL);
-    k_timer_start(&updateStorage, K_SECONDS(180), K_SECONDS(180));
+    // k_timer_init(&updateStorage, print_storage_all,NULL);
+    // k_timer_start(&updateStorage, K_SECONDS(180), K_SECONDS(180));
     printk("%s %s update timer\n", strPass, strInit);
 
     // Status check
